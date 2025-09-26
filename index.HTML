@@ -11,7 +11,8 @@
       height: 100%;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      color: #ff69b4; /* hot pink */
+      color: #ff69b4; 
+      background: #ffe4f2;
     }
 
     canvas {
@@ -19,7 +20,7 @@
       top: 0;
       left: 0;
       z-index: 0;
-      background: #ffe4f2; /* light pink background */
+      background: #ffe4f2;
     }
 
     .profile {
@@ -34,7 +35,7 @@
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      border: 3px solid #ff1493; /* deep pink border */
+      border: 3px solid #ff1493;
     }
 
     .profile h1 {
@@ -55,15 +56,9 @@
       z-index: 1;
     }
 
-    #christmas {
-      top: 200px;
-    }
+    #christmas { top: 200px; }
+    #summer { top: 300px; }
 
-    #summer {
-      top: 300px;
-    }
-
-    /* Toolbar (clear + colors) */
     .toolbar {
       position: absolute;
       top: 20px;
@@ -81,52 +76,43 @@
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
-      transition: transform 0.2s;
     }
 
-    .toolbar button:hover {
-      transform: scale(1.1);
-    }
-
-    #clearBtn {
-      background-color: #ff69b4;
-    }
-
-    #clearBtn:hover {
-      background-color: #ff1493;
-    }
-
-    .colorBtn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid white;
-      cursor: pointer;
-      padding: 0;
-    }
-
+    #clearBtn { background-color: #ff69b4; }
     .pink { background-color: #ff69b4; }
     .purple { background-color: #a020f0; }
     .blue { background-color: #1e90ff; }
+
+    #schoolBtn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: #ff69b4;
+      color: white;
+      font-size: 18px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    #schoolBtn:hover { background: #ff1493; }
   </style>
 </head>
 <body>
-  <!-- Interactive whiteboard -->
   <canvas id="whiteboard"></canvas>
 
-  <!-- Profile -->
   <div class="profile">
     <img src="Screenshot%202025-09-25%20082821.png" alt="Profile Picture">
     <h1>Ella Fehlauer</h1>
   </div>
 
-  <!-- Christmas countdown -->
   <div class="countdown" id="christmas">
     <p>🎄 Christmas Countdown 🎄</p>
     <p id="timer-christmas"></p>
   </div>
 
-  <!-- Summer Vacation countdown -->
   <div class="countdown" id="summer">
     <p>☀️ Summer Vacation! ☀️</p>
     <p id="timer-summer"></p>
@@ -135,35 +121,26 @@
   <!-- Toolbar -->
   <div class="toolbar">
     <button id="clearBtn">Clear</button>
-    <button class="colorBtn pink" data-color="#ff69b4"></button>
-    <button class="colorBtn purple" data-color="#a020f0"></button>
-    <button class="colorBtn blue" data-color="#1e90ff"></button>
+    <button class="pink" data-color="#ff69b4"></button>
+    <button class="purple" data-color="#a020f0"></button>
+    <button class="blue" data-color="#1e90ff"></button>
   </div>
 
+  <!-- School Page Button -->
+  <button id="schoolBtn" onclick="location.href='school.html'">📚 School Tools</button>
+
   <script>
-    // Resize canvas
+    // Whiteboard
     const canvas = document.getElementById("whiteboard");
     const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-
-    // Drawing
     let drawing = false;
-    let currentColor = "#ff69b4"; // default pink
+    let currentColor = "#ff69b4";
 
-    canvas.addEventListener("mousedown", () => {
-      drawing = true;
-      ctx.beginPath();
-    });
+    canvas.addEventListener("mousedown", () => { drawing = true; ctx.beginPath(); });
     canvas.addEventListener("mouseup", () => drawing = false);
-    canvas.addEventListener("mousemove", draw);
-
-    function draw(e) {
+    canvas.addEventListener("mousemove", e => {
       if (!drawing) return;
       ctx.lineWidth = 4;
       ctx.lineCap = "round";
@@ -172,63 +149,37 @@
       ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(e.clientX, e.clientY);
-    }
+    });
 
-    // Clear button
     document.getElementById("clearBtn").addEventListener("click", () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
-
-    // Color buttons
-    document.querySelectorAll(".colorBtn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        currentColor = btn.getAttribute("data-color");
-      });
+    document.querySelectorAll("[data-color]").forEach(btn => {
+      btn.addEventListener("click", () => currentColor = btn.getAttribute("data-color"));
     });
 
-    // Countdown function
+    // Countdowns
     function updateCountdown(targetDate, elementId, includeYears=false) {
       const now = new Date();
       const diff = targetDate - now;
+      if (diff <= 0) return document.getElementById(elementId).textContent = "It's here! 🎉";
 
-      if (diff <= 0) {
-        document.getElementById(elementId).textContent = "It's here! 🎉";
-        return;
-      }
-
-      let years = 0;
-      if (includeYears) {
-        years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-      }
-
-      const months = Math.floor((diff / (1000 * 60 * 60 * 24 * 30.44)) % 12);
-      const days = Math.floor((diff / (1000 * 60 * 60 * 24)) % 30.44);
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      let years = includeYears ? Math.floor(diff / (1000*60*60*24*365.25)) : 0;
+      const months = Math.floor((diff / (1000*60*60*24*30.44)) % 12);
+      const days = Math.floor((diff / (1000*60*60*24)) % 30.44);
+      const hours = Math.floor((diff / (1000*60*60)) % 24);
+      const minutes = Math.floor((diff / (1000*60)) % 60);
       const seconds = Math.floor((diff / 1000) % 60);
-
-      let text = "";
-      if (includeYears) {
-        text += `${years} years, `;
-      }
+      let text = includeYears ? `${years} years, ` : "";
       text += `${months} months, ${days} days, ${hours} hrs, ${minutes} min, ${seconds} sec`;
-
       document.getElementById(elementId).textContent = text;
     }
 
-    // Targets
-    const christmas = new Date(new Date().getFullYear(), 11, 25);
-    const summerVacation = new Date("May 29, 2026 00:00:00");
-
     setInterval(() => {
-      // If Christmas has passed, count next year's
       let nextChristmas = new Date(new Date().getFullYear(), 11, 25);
-      if (new Date() > nextChristmas) {
-        nextChristmas.setFullYear(nextChristmas.getFullYear() + 1);
-      }
+      if (new Date() > nextChristmas) nextChristmas.setFullYear(nextChristmas.getFullYear() + 1);
       updateCountdown(nextChristmas, "timer-christmas");
-
-      updateCountdown(summerVacation, "timer-summer", true);
+      updateCountdown(new Date("May 29, 2026 00:00:00"), "timer-summer", true);
     }, 1000);
   </script>
 </body>

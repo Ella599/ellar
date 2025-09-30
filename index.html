@@ -2,307 +2,277 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ella Fehlauer - Profile</title>
   <style>
-    /* ---------- GENERAL STYLES ---------- */
     body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
+      margin: 0; padding: 0; height: 100%; width: 100%;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
-
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .widget {
-      pointer-events: auto;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 10px;
-      border-radius: 10px;
-      margin: 10px;
-    }
-
-    .top-left {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-    }
-
-    .top-right {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-
-    .bottom-left {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-    }
-
-    .bottom-right {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-    }
-
-    /* ---------- WHITEBOARD ---------- */
+    /* Whiteboard */
     #whiteboard {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #ffe6f2;
-      z-index: -1;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      background: white;
     }
-
-    #toolbar {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+    /* Overlay content */
+    .content {
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+      color: #333;
     }
-
-    #toolbar button, #toolbar input {
-      margin: 2px 0;
+    .profile {
+      position: absolute;
+      top: 10px; left: 10px;
+      background: rgba(255,182,193,0.8);
+      padding: 10px;
+      border-radius: 12px;
+      text-align: center;
     }
-
-    /* ---------- PROFILE ---------- */
-    #profile-pic {
-      width: 120px;
-      height: 120px;
+    .profile img {
+      width: 100px; height: 100px;
       border-radius: 50%;
       object-fit: cover;
+      display: block;
+      margin: auto;
     }
-
-    #pet {
-      width: 120px;
-      height: 120px;
+    .countdowns {
+      position: absolute;
+      top: 10px; right: 250px;
+      background: rgba(255,182,193,0.8);
+      padding: 10px;
+      border-radius: 12px;
+      text-align: center;
     }
-
-    /* ---------- THEMES ---------- */
-    .pink { background-color: #ffe6f2; }
-    .purple { background-color: #f0e6ff; }
-    .teal { background-color: #e6fff7; }
-    .rainbow {
-      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fad0c4, #fbc2eb, #a6c1ee, #84fab0, #8fd3f4);
-      background-size: 1400% 1400%;
-      animation: rainbow 15s ease infinite;
+    .quote-box, .affirmation-box {
+      background: rgba(255,182,193,0.8);
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 12px;
     }
-    @keyframes rainbow {
-      0% {background-position:0% 50%}
-      50% {background-position:100% 50%}
-      100% {background-position:0% 50%}
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      right: 0; top: 0;
+      width: 240px;
+      height: 100%;
+      background: rgba(255,182,193,0.95);
+      box-shadow: -3px 0 6px rgba(0,0,0,0.2);
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 3;
+      transition: transform 0.3s ease;
     }
-
-    /* ---------- PET JUMP ---------- */
-    .jump {
-      animation: jump 0.6s ease;
+    .sidebar.collapsed {
+      transform: translateX(100%);
     }
-    @keyframes jump {
-      0% { transform: translateY(0); }
-      30% { transform: translateY(-30px); }
-      60% { transform: translateY(0); }
-      100% { transform: translateY(0); }
+    .toggle-btn {
+      position: fixed;
+      top: 10px; right: 250px;
+      background: #ff69b4;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      z-index: 4;
+    }
+    button {
+      margin-top: 5px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      background: #ff69b4;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff85c1;
+    }
+    audio {
+      width: 100%;
     }
   </style>
 </head>
-<body class="pink">
-
-  <!-- Whiteboard -->
+<body>
   <canvas id="whiteboard"></canvas>
 
-  <!-- Overlay Widgets -->
-  <div class="overlay">
-
+  <div class="content">
     <!-- Profile -->
-    <div class="widget top-left">
-      <img id="profile-pic" src="https://i.imgur.com/4AiXzf8.jpeg" alt="Profile Picture"/>
-      <p><strong>Ella Fehlauer</strong></p>
-      <input type="file" id="uploadPic" />
-      <button id="toggleAvatar">Use Avatar</button>
+    <div class="profile">
+      <img src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
+      <h2>Ella Fehlauer</h2>
     </div>
 
     <!-- Countdowns -->
-    <div class="widget top-right">
-      <h3>🎄 Christmas Countdown</h3>
-      <div id="christmas"></div>
-      <h3>☀️ Summer Vacation</h3>
-      <div id="summer"></div>
+    <div class="countdowns">
+      <h3>🎄 Christmas!</h3>
+      <p id="christmas"></p>
+      <h3>☀️ Summer Vacation!</h3>
+      <p id="summer"></p>
     </div>
 
-    <!-- Pet -->
-    <div class="widget bottom-left">
-      <img id="pet" src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Dog Pet"/>
-      <button id="feedPet">Feed Dog 🍖</button>
+    <!-- Inspiration -->
+    <div class="quote-box">
+      <h3>🌟 Inspiration</h3>
+      <p id="quoteText">Loading...</p>
+      <button onclick="newQuote()">New Quote</button>
     </div>
 
-    <!-- Whiteboard Toolbar -->
-    <div id="toolbar" class="widget bottom-left" style="left:150px;">
-      <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
-      <label>Size: <input type="range" id="sizePicker" min="1" max="20" value="3"></label>
-      <button id="clearBtn">Clear</button>
-      <button id="lockBtn">Lock Whiteboard</button>
+    <!-- Affirmation -->
+    <div class="affirmation-box">
+      <h3>💖 Daily Affirmation</h3>
+      <p id="affirmationText">Loading...</p>
+      <button onclick="newAffirmation()">New Affirmation</button>
     </div>
+  </div>
 
-    <!-- Bottom-right stuff -->
-    <div class="widget bottom-right">
-      <button id="themeBtn">Change Theme</button>
-      <button onclick="location.href='school.html'">School Tools</button>
-      <h3>🌟 Quote of the Day</h3>
-      <div id="quote"></div>
-      <button id="affirmBtn">Daily Affirmation</button>
-      <div id="affirmation"></div>
-      <h3>🎵 Music Player</h3>
-      <audio controls>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-    </div>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <h3>🎵 Music Player</h3>
+    <audio controls>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    <h3>📚 School Tools</h3>
+    <button onclick="location.href='school.html'">Go to School Page</button>
+  </div>
 
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- Whiteboard controls -->
+  <div style="position: fixed; bottom: 10px; left: 10px; z-index: 4;">
+    <button onclick="clearBoard()">Clear</button>
+    <button onclick="toggleLock()" id="lockBtn">Lock</button>
+    <input type="color" id="colorPicker" value="#000000">
   </div>
 
   <script>
-    /* ---------- WHITEBOARD ---------- */
+    /* -------- WHITEBOARD -------- */
     const canvas = document.getElementById('whiteboard');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
     let drawing = false;
     let locked = false;
-    let color = document.getElementById('colorPicker').value;
-    let size = document.getElementById('sizePicker').value;
+    let color = "#000000";
 
-    function startDraw(e) {
-      if (locked) return;
-      drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(e.clientX, e.clientY);
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    function draw(e) {
-      if (!drawing || locked) return;
-      ctx.lineWidth = size;
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    canvas.addEventListener('mousedown', e => { if(!locked){drawing = true; draw(e);} });
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseout', () => drawing = false);
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e){
+      if(!drawing) return;
+      ctx.lineWidth = 3;
       ctx.lineCap = "round";
       ctx.strokeStyle = color;
       ctx.lineTo(e.clientX, e.clientY);
       ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX, e.clientY);
     }
-    function endDraw() {
-      drawing = false;
+    function clearBoard(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
     }
-
-    canvas.addEventListener('mousedown', startDraw);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', endDraw);
-    canvas.addEventListener('mouseout', endDraw);
-
-    document.getElementById('clearBtn').onclick = () => ctx.clearRect(0,0,canvas.width,canvas.height);
-    document.getElementById('colorPicker').oninput = e => color = e.target.value;
-    document.getElementById('sizePicker').oninput = e => size = e.target.value;
-    document.getElementById('lockBtn').onclick = () => {
+    function toggleLock(){
       locked = !locked;
-      document.getElementById('lockBtn').innerText = locked ? "Unlock Whiteboard" : "Lock Whiteboard";
-    };
-
-    /* ---------- THEME TOGGLE ---------- */
-    const themes = ["pink", "purple", "teal", "rainbow"];
-    let currentTheme = 0;
-    document.getElementById('themeBtn').onclick = () => {
-      currentTheme = (currentTheme + 1) % themes.length;
-      document.body.className = themes[currentTheme];
-    };
-
-    /* ---------- PROFILE PICTURE / AVATAR ---------- */
-    const profilePic = document.getElementById('profile-pic');
-    const uploadInput = document.getElementById('uploadPic');
-    const toggleAvatarBtn = document.getElementById('toggleAvatar');
-    let usingAvatar = false;
-    const avatarURL = "https://i.imgur.com/8Km9tLL.png"; // cute cartoon avatar
-
-    uploadInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          profilePic.src = reader.result;
-          usingAvatar = false;
-          toggleAvatarBtn.innerText = "Use Avatar";
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    toggleAvatarBtn.onclick = () => {
-      if (!usingAvatar) {
-        profilePic.src = avatarURL;
-        usingAvatar = true;
-        toggleAvatarBtn.innerText = "Use Uploaded Pic";
-      } else {
-        profilePic.src = "https://i.imgur.com/4AiXzf8.jpeg";
-        usingAvatar = false;
-        toggleAvatarBtn.innerText = "Use Avatar";
-      }
-    };
-
-    /* ---------- COUNTDOWNS ---------- */
-    function updateCountdown(id, targetDate) {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-      if (distance < 0) {
-        document.getElementById(id).innerText = "🎉 It's here!";
-        return;
-      }
-      const years = Math.floor(distance / (1000 * 60 * 60 * 24 * 365));
-      const months = Math.floor(distance / (1000 * 60 * 60 * 24 * 30));
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24))/(1000*60*60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60))/(1000*60));
-      const seconds = Math.floor((distance % (1000 * 60))/1000);
-      document.getElementById(id).innerText = 
-        `${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      document.getElementById("lockBtn").textContent = locked ? "Unlock" : "Lock";
     }
-    setInterval(() => {
-      updateCountdown("christmas", new Date("Dec 25, 2025 00:00:00").getTime());
-      updateCountdown("summer", new Date("May 29, 2026 00:00:00").getTime());
-    }, 1000);
+    document.getElementById("colorPicker").addEventListener("input", e => color = e.target.value);
 
-    /* ---------- PET ---------- */
-    const pet = document.getElementById('pet');
-    document.getElementById('feedPet').onclick = () => {
-      pet.classList.add('jump');
-      setTimeout(()=> pet.classList.remove('jump'), 600);
-    };
+    /* -------- COUNTDOWNS -------- */
+    function updateCountdowns(){
+      const now = new Date();
+      // Christmas
+      const christmas = new Date("Dec 25, 2025 00:00:00");
+      updateCountdown("christmas", christmas, now);
+      // Summer
+      const summer = new Date("May 29, 2026 00:00:00");
+      updateCountdown("summer", summer, now);
+    }
+    function updateCountdown(id, date, now){
+      let diff = date - now;
+      if (diff < 0) { document.getElementById(id).innerText = "Passed!"; return; }
+      const sec = Math.floor(diff/1000)%60;
+      const min = Math.floor(diff/1000/60)%60;
+      const hr = Math.floor(diff/1000/60/60)%24;
+      const days = Math.floor(diff/1000/60/60/24)%30;
+      const months = Math.floor(diff/1000/60/60/24/30)%12;
+      const years = Math.floor(diff/1000/60/60/24/365);
+      document.getElementById(id).innerText = 
+        `${years}y ${months}m ${days}d ${hr}h ${min}m ${sec}s`;
+    }
+    setInterval(updateCountdowns,1000);
+    updateCountdowns();
 
-    /* ---------- QUOTES + AFFIRMATIONS ---------- */
+    /* -------- QUOTES -------- */
     const quotes = [
-      "Believe in yourself and all that you are.",
-      "You are capable of amazing things.",
+      "Believe you can and you're halfway there.",
       "Start each day with a positive thought.",
-      "Your only limit is your mind.",
-      "Dream it. Wish it. Do it."
+      "Your potential is endless.",
+      "Dream big, work hard, stay focused.",
+      "You are capable of amazing things.",
+      "Every day is a fresh start.",
+      "Progress, not perfection."
     ];
-    document.getElementById('quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+    function newQuote(){
+      const q = quotes[Math.floor(Math.random()*quotes.length)];
+      document.getElementById("quoteText").textContent = q;
+      localStorage.setItem("dailyQuote", q);
+      localStorage.setItem("quoteDate", new Date().toDateString());
+    }
+    function loadDailyQuote(){
+      const saved = localStorage.getItem("dailyQuote");
+      const date = localStorage.getItem("quoteDate");
+      const today = new Date().toDateString();
+      if(saved && date === today){
+        document.getElementById("quoteText").textContent = saved;
+      } else {
+        newQuote();
+      }
+    }
+    loadDailyQuote();
 
+    /* -------- AFFIRMATIONS -------- */
     const affirmations = [
-      "I am strong.",
-      "I can achieve anything I set my mind to.",
-      "I am proud of myself.",
-      "I grow and improve every day.",
-      "I bring positivity wherever I go."
+      "I am strong and capable.",
+      "I learn and grow every day.",
+      "I believe in myself.",
+      "I choose positivity.",
+      "I can achieve my goals.",
+      "I am proud of my progress.",
+      "I am enough."
     ];
-    document.getElementById('affirmBtn').onclick = () => {
-      document.getElementById('affirmation').innerText = affirmations[Math.floor(Math.random()*affirmations.length)];
-    };
+    function newAffirmation(){
+      const a = affirmations[Math.floor(Math.random()*affirmations.length)];
+      document.getElementById("affirmationText").textContent = a;
+      localStorage.setItem("dailyAffirmation", a);
+      localStorage.setItem("affirmDate", new Date().toDateString());
+    }
+    function loadDailyAffirmation(){
+      const saved = localStorage.getItem("dailyAffirmation");
+      const date = localStorage.getItem("affirmDate");
+      const today = new Date().toDateString();
+      if(saved && date === today){
+        document.getElementById("affirmationText").textContent = saved;
+      } else {
+        newAffirmation();
+      }
+    }
+    loadDailyAffirmation();
+
+    /* -------- SIDEBAR -------- */
+    function toggleSidebar(){
+      document.getElementById("sidebar").classList.toggle("collapsed");
+    }
   </script>
 </body>
 </html>

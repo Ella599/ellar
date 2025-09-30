@@ -2,121 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>School Tools</title>
+  <title>Ella's School Page</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #ffe4f2;
-      color: #ff1493;
       margin: 0;
+      font-family: Arial, sans-serif;
+      background: #ffe6f2;
       padding: 20px;
     }
-
-    h1 { text-align: center; }
-
-    .backBtn {
-      background: #ff69b4;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-bottom: 20px;
+    h1 {
+      color: #ff4d94;
+      text-align: center;
     }
-
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 40px;
-      justify-content: center;
-    }
-
     .box {
-      background: white;
+      background: #ffb6c1;
       padding: 20px;
       border-radius: 12px;
-      border: 2px solid #ff69b4;
-      width: 320px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
     }
-
+    input, button, textarea {
+      padding: 5px;
+      margin: 5px 0;
+    }
     ul { list-style: none; padding: 0; }
-    li { margin: 5px 0; }
-
-    .task {
+    li.task {
+      background: #fff;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .calendar { text-align: center; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ff69b4; padding: 8px; text-align: center; }
-    th { background: #ff69b4; color: white; }
-
-    td[contenteditable="true"] {
-      background: #fff0f5;
-      outline: none;
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
-
-    button {
-      background: #ff69b4;
+    th, td {
+      border: 1px solid #ff4d94;
+      padding: 8px;
+      text-align: center;
+    }
+    /* Sticky Notes */
+    .note-board {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      border: 2px dashed #ff66b2;
+      background: #fff0f5;
+      overflow: hidden;
+    }
+    .sticky {
+      position: absolute;
+      background: #ffb6c1;
+      padding: 10px;
+      width: 150px;
+      min-height: 100px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      cursor: move;
+    }
+    .sticky textarea {
+      width: 100%;
+      height: 80px;
+      border: none;
+      resize: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .sticky button {
+      background: #ff4d94;
       border: none;
       color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
+      font-size: 12px;
+      padding: 3px 6px;
+      border-radius: 4px;
       cursor: pointer;
-    }
-
-    button:hover {
-      background: #ff1493;
+      float: right;
     }
   </style>
 </head>
 <body>
-  <button class="backBtn" onclick="location.href='index.html'">⬅ Back</button>
-  <h1>📚 School Tools</h1>
+  <h1>School Dashboard</h1>
 
-  <div class="container">
-    <!-- Homework Tracker -->
-    <div class="box">
-      <h2>Homework Tracker</h2>
-      <input type="text" id="taskInput" placeholder="Enter homework...">
-      <input type="date" id="dateInput">
-      <button onclick="addTask()">Add</button>
-      <ul id="taskList"></ul>
-    </div>
+  <!-- Homework Tracker -->
+  <div class="box">
+    <h2>Homework Tracker</h2>
+    <input type="text" id="taskInput" placeholder="Enter homework...">
+    <input type="date" id="dateInput">
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </div>
 
-    <!-- Calendar -->
-    <div class="box calendar">
-      <h2>Calendar</h2>
-      <div id="calendar"></div>
-    </div>
+  <!-- Daily Schedule -->
+  <div class="box">
+    <h2>Daily Schedule</h2>
+    <table id="scheduleTable">
+      <tr><th>Time</th><th>Class</th><th>Action</th></tr>
+      <tr>
+        <td contenteditable="true">8:00 AM</td>
+        <td contenteditable="true">Math</td>
+        <td><button onclick="removeRow(this)">❌</button></td>
+      </tr>
+      <tr>
+        <td contenteditable="true">9:00 AM</td>
+        <td contenteditable="true">Science</td>
+        <td><button onclick="removeRow(this)">❌</button></td>
+      </tr>
+      <tr>
+        <td contenteditable="true">10:00 AM</td>
+        <td contenteditable="true">English</td>
+        <td><button onclick="removeRow(this)">❌</button></td>
+      </tr>
+    </table>
+    <button onclick="addRow()">➕ Add Row</button>
+  </div>
 
-    <!-- Daily Schedule -->
-    <div class="box">
-      <h2>Daily Schedule</h2>
-      <table id="scheduleTable">
-        <tr><th>Time</th><th>Class</th><th>Action</th></tr>
-        <tr>
-          <td contenteditable="true">8:00 AM</td>
-          <td contenteditable="true">Math</td>
-          <td><button onclick="removeRow(this)">❌</button></td>
-        </tr>
-        <tr>
-          <td contenteditable="true">9:00 AM</td>
-          <td contenteditable="true">Science</td>
-          <td><button onclick="removeRow(this)">❌</button></td>
-        </tr>
-        <tr>
-          <td contenteditable="true">10:00 AM</td>
-          <td contenteditable="true">English</td>
-          <td><button onclick="removeRow(this)">❌</button></td>
-        </tr>
-      </table>
-      <button onclick="addRow()">➕ Add Row</button>
-    </div>
+  <!-- Calendar -->
+  <div class="box">
+    <h2>Calendar</h2>
+    <iframe src="https://calendar.google.com/calendar/embed?mode=MONTH" 
+            style="border:0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+  </div>
+
+  <!-- Sticky Notes -->
+  <div class="box">
+    <h2>Sticky Notes</h2>
+    <button onclick="addStickyNote()">➕ Add Note</button>
+    <div id="noteBoard" class="note-board"></div>
   </div>
 
   <script>
@@ -185,37 +200,11 @@
 
     loadTasks();
 
-    /* ---------------- Calendar ---------------- */
-    function generateCalendar() {
-      const calendarDiv = document.getElementById("calendar");
-      const date = new Date();
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      let table = "<table><tr>";
-      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      for (let d of days) table += `<th>${d}</th>`;
-      table += "</tr><tr>";
-
-      for (let i = 0; i < firstDay; i++) table += "<td></td>";
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const today = day === date.getDate() ? " style='background:#ffb6c1;'" : "";
-        table += `<td${today}>${day}</td>`;
-        if ((day + firstDay) % 7 === 0) table += "</tr><tr>";
-      }
-      table += "</tr></table>";
-      calendarDiv.innerHTML = table;
-    }
-    generateCalendar();
-
     /* ---------------- Editable + Customizable Schedule ---------------- */
     const scheduleTable = document.getElementById("scheduleTable");
 
     function saveSchedule() {
-      const rows = Array.from(scheduleTable.querySelectorAll("tr")).slice(1); // skip header
+      const rows = Array.from(scheduleTable.querySelectorAll("tr")).slice(1);
       const data = rows.map(r => [
         r.cells[0].textContent.trim(),
         r.cells[1].textContent.trim()
@@ -226,11 +215,7 @@
     function loadSchedule() {
       const saved = JSON.parse(localStorage.getItem("schedule") || "[]");
       if (saved.length === 0) return;
-
-      // Clear existing rows except header
       scheduleTable.querySelectorAll("tr:not(:first-child)").forEach(r => r.remove());
-
-      // Add saved rows
       saved.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -258,10 +243,76 @@
       saveSchedule();
     }
 
-    // Save whenever user types
     scheduleTable.addEventListener("input", saveSchedule);
-
     loadSchedule();
+
+    /* ---------------- Sticky Note Board ---------------- */
+    const noteBoard = document.getElementById("noteBoard");
+
+    function saveNotes() {
+      const notes = [];
+      document.querySelectorAll(".sticky").forEach(note => {
+        notes.push({
+          text: note.querySelector("textarea").value,
+          x: note.style.left,
+          y: note.style.top
+        });
+      });
+      localStorage.setItem("stickyBoard", JSON.stringify(notes));
+    }
+
+    function loadNotes() {
+      const saved = JSON.parse(localStorage.getItem("stickyBoard") || "[]");
+      saved.forEach(n => createSticky(n.text, n.x, n.y));
+    }
+
+    function addStickyNote() {
+      createSticky("", "10px", "10px");
+      saveNotes();
+    }
+
+    function createSticky(text, left, top) {
+      const note = document.createElement("div");
+      note.className = "sticky";
+      note.style.left = left;
+      note.style.top = top;
+
+      note.innerHTML = `
+        <button onclick="this.parentElement.remove(); saveNotes()">❌</button>
+        <textarea>${text}</textarea>
+      `;
+
+      noteBoard.appendChild(note);
+
+      const textarea = note.querySelector("textarea");
+      textarea.addEventListener("input", saveNotes);
+
+      note.onmousedown = function(e) {
+        let shiftX = e.clientX - note.getBoundingClientRect().left;
+        let shiftY = e.clientY - note.getBoundingClientRect().top;
+
+        function moveAt(pageX, pageY) {
+          note.style.left = pageX - shiftX + "px";
+          note.style.top = pageY - shiftY + "px";
+        }
+
+        function onMouseMove(e) {
+          moveAt(e.pageX, e.pageY);
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+
+        note.onmouseup = function() {
+          document.removeEventListener("mousemove", onMouseMove);
+          note.onmouseup = null;
+          saveNotes();
+        };
+      };
+
+      note.ondragstart = () => false;
+    }
+
+    loadNotes();
   </script>
 </body>
 </html>

@@ -52,7 +52,7 @@
     #board {
       display: block;
       width: 100%;
-      height: calc(100vh - 180px);
+      height: calc(100vh - 250px);
       border-top: 2px solid white;
       cursor: crosshair;
     }
@@ -87,6 +87,8 @@
       align-items: center;
       padding: 10px 20px;
       background: #ffccdd;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     button {
@@ -100,6 +102,14 @@
 
     button:hover {
       background: #ff3385;
+    }
+
+    #inspiration {
+      text-align: center;
+      padding: 10px;
+      font-style: italic;
+      background: #fff0f5;
+      color: #660033;
     }
   </style>
 </head>
@@ -116,6 +126,13 @@
     <div class="countdown" id="christmas"></div>
   </div>
 
+  <!-- Inspiration -->
+  <div id="inspiration">
+    <div id="quote"></div>
+    <button onclick="showAffirmation()">💖 Daily Affirmation</button>
+    <div id="affirmation"></div>
+  </div>
+
   <!-- Whiteboard Controls -->
   <div id="controls">
     <label>Color:</label>
@@ -127,6 +144,9 @@
 
   <!-- 3D Pet -->
   <div id="pet"></div>
+  <div style="position:absolute; bottom:230px; right:30px;">
+    <button onclick="feedPet()">🍖 Feed Dog</button>
+  </div>
 
   <footer>
     <button onclick="toggleTheme()">🎨 Change Theme</button>
@@ -147,3 +167,167 @@
     const profilePic = document.getElementById("profilePic");
     const picUpload = document.getElementById("picUpload");
     const avatarBtn = document.getElementById("avatarBtn");
+
+    const savedPic = localStorage.getItem("profilePic");
+    if (savedPic) profilePic.src = savedPic;
+
+    picUpload.addEventListener("change", function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        profilePic.src = e.target.result;
+        localStorage.setItem("profilePic", e.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    avatarBtn.addEventListener("click", () => {
+      const avatarUrl = "https://i.ibb.co/4Y3mJrh/avatar.png"; // sample avatar
+      profilePic.src = avatarUrl;
+      localStorage.setItem("profilePic", avatarUrl);
+    });
+
+    /* ---------------- Countdowns ---------------- */
+    function updateCountdown(id, targetDate, label) {
+      const now = new Date();
+      const diff = targetDate - now;
+      if (diff <= 0) {
+        document.getElementById(id).textContent = `${label} is here!`;
+        return;
+      }
+      const seconds = Math.floor(diff / 1000) % 60;
+      const minutes = Math.floor(diff / (1000 * 60)) % 60;
+      const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24)) % 30;
+      const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30)) % 12;
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+      document.getElementById(id).textContent =
+        `${label}: ${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+    setInterval(() => {
+      updateCountdown("christmas", new Date("2025-12-25"), "🎄 Christmas");
+      updateCountdown("summer", new Date("2026-05-29"), "☀️ Summer Vacation");
+    }, 1000);
+
+    /* ---------------- Whiteboard ---------------- */
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+    const colorPicker = document.getElementById("colorPicker");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 250;
+
+    let drawing = false;
+
+    canvas.addEventListener("mousedown", (e) => {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+    canvas.addEventListener("mouseup", () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener("mousemove", draw);
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    }
+    function clearBoard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    /* ---------------- Inspiration ---------------- */
+    const quotes = [
+      "Believe in yourself and all that you are.",
+      "Every day is a fresh start.",
+      "Dream big and dare to fail.",
+      "You are stronger than you think.",
+      "Do something today that your future self will thank you for."
+    ];
+    document.getElementById("quote").textContent =
+      quotes[Math.floor(Math.random() * quotes.length)];
+
+    const affirmations = [
+      "You are capable of amazing things.",
+      "You light up the world with your smile.",
+      "You can handle anything that comes your way.",
+      "Keep going — you’re doing great!",
+      "You are loved, valued, and enough."
+    ];
+    function showAffirmation() {
+      document.getElementById("affirmation").textContent =
+        affirmations[Math.floor(Math.random() * affirmations.length)];
+    }
+
+    /* ---------------- 3D Dog Pet ---------------- */
+    const petContainer = document.getElementById("pet");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      50, petContainer.clientWidth / petContainer.clientHeight, 0.1, 1000
+    );
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(petContainer.clientWidth, petContainer.clientHeight);
+    petContainer.appendChild(renderer.domElement);
+
+    const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+    scene.add(light);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(3, 10, 5);
+    scene.add(dirLight);
+
+    let dog;
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb", 
+      function(gltf) {
+        dog = gltf.scene;
+        dog.scale.set(0.02, 0.02, 0.02);
+        dog.position.y = -1;
+        scene.add(dog);
+        camera.position.z = 5;
+      },
+      undefined,
+      function(error) { console.error("Error loading model:", error); }
+    );
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (dog) dog.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    petContainer.addEventListener("click", () => {
+      if (dog) {
+        dog.position.y = -0.5;
+        setTimeout(() => dog.position.y = -1, 300);
+      }
+    });
+
+    /* ---------------- Pet Interactions ---------------- */
+    function feedPet() {
+      const treat = document.createElement("div");
+      treat.textContent = "🍖";
+      treat.style.position = "absolute";
+      treat.style.fontSize = "24px";
+      treat.style.bottom = "220px";
+      treat.style.right = "60px";
+      document.body.appendChild(treat);
+      setTimeout(() => treat.remove(), 2000);
+    }
+
+    /* ---------------- Theme Toggle ---------------- */
+    const themes = ["pink", "plum", "teal", "linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)"];
+    let currentTheme = 0;
+    function toggleTheme() {
+      currentTheme = (currentTheme + 1) % themes.length;
+      document.body.style.background = themes[currentTheme];
+    }
+  </script>
+</body>
+</html>

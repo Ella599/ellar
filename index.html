@@ -17,20 +17,16 @@
       z-index: 0;
       background: white;
     }
-    /* Overlay content */
-    .content {
-      position: relative;
-      z-index: 2;
-      padding: 20px;
-      color: #333;
-    }
-    .profile {
+    /* Card styling */
+    .card {
       position: absolute;
-      top: 10px; left: 10px;
-      background: rgba(255,182,193,0.8);
-      padding: 10px;
+      background: rgba(255,182,193,0.9);
+      padding: 15px;
       border-radius: 12px;
-      text-align: center;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+      cursor: move;
+      z-index: 2;
+      width: 220px;
     }
     .profile img {
       width: 100px; height: 100px;
@@ -38,47 +34,6 @@
       object-fit: cover;
       display: block;
       margin: auto;
-    }
-    .countdowns {
-      position: absolute;
-      top: 10px; right: 250px;
-      background: rgba(255,182,193,0.8);
-      padding: 10px;
-      border-radius: 12px;
-      text-align: center;
-    }
-    .quote-box, .affirmation-box {
-      background: rgba(255,182,193,0.8);
-      padding: 15px;
-      margin-top: 10px;
-      border-radius: 12px;
-    }
-    /* Sidebar */
-    .sidebar {
-      position: fixed;
-      right: 0; top: 0;
-      width: 240px;
-      height: 100%;
-      background: rgba(255,182,193,0.95);
-      box-shadow: -3px 0 6px rgba(0,0,0,0.2);
-      padding: 20px;
-      box-sizing: border-box;
-      z-index: 3;
-      transition: transform 0.3s ease;
-    }
-    .sidebar.collapsed {
-      transform: translateX(100%);
-    }
-    .toggle-btn {
-      position: fixed;
-      top: 10px; right: 250px;
-      background: #ff69b4;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 6px;
-      z-index: 4;
     }
     button {
       margin-top: 5px;
@@ -95,55 +50,56 @@
     audio {
       width: 100%;
     }
+    /* Whiteboard controls */
+    .controls {
+      position: fixed;
+      bottom: 10px; left: 10px;
+      z-index: 3;
+    }
   </style>
 </head>
 <body>
   <canvas id="whiteboard"></canvas>
 
-  <div class="content">
-    <!-- Profile -->
-    <div class="profile">
-      <img src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
-      <h2>Ella Fehlauer</h2>
-    </div>
-
-    <!-- Countdowns -->
-    <div class="countdowns">
-      <h3>🎄 Christmas!</h3>
-      <p id="christmas"></p>
-      <h3>☀️ Summer Vacation!</h3>
-      <p id="summer"></p>
-    </div>
-
-    <!-- Inspiration -->
-    <div class="quote-box">
-      <h3>🌟 Inspiration</h3>
-      <p id="quoteText">Loading...</p>
-      <button onclick="newQuote()">New Quote</button>
-    </div>
-
-    <!-- Affirmation -->
-    <div class="affirmation-box">
-      <h3>💖 Daily Affirmation</h3>
-      <p id="affirmationText">Loading...</p>
-      <button onclick="newAffirmation()">New Affirmation</button>
-    </div>
+  <!-- Cards -->
+  <div class="card profile" style="top: 10px; left: 10px;">
+    <img src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
+    <h2>Ella Fehlauer</h2>
   </div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
+  <div class="card" style="top: 10px; right: 10px;">
+    <h3>🎄 Christmas!</h3>
+    <p id="christmas"></p>
+    <h3>☀️ Summer Vacation!</h3>
+    <p id="summer"></p>
+  </div>
+
+  <div class="card" style="bottom: 200px; left: 10px;">
+    <h3>🌟 Inspiration</h3>
+    <p id="quoteText">Loading...</p>
+    <button onclick="newQuote()">New Quote</button>
+  </div>
+
+  <div class="card" style="bottom: 90px; left: 10px;">
+    <h3>💖 Daily Affirmation</h3>
+    <p id="affirmationText">Loading...</p>
+    <button onclick="newAffirmation()">New Affirmation</button>
+  </div>
+
+  <div class="card" style="bottom: 200px; right: 10px;">
     <h3>🎵 Music Player</h3>
     <audio controls>
       <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
     </audio>
+  </div>
+
+  <div class="card" style="bottom: 90px; right: 10px;">
     <h3>📚 School Tools</h3>
     <button onclick="location.href='school.html'">Go to School Page</button>
   </div>
 
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-
   <!-- Whiteboard controls -->
-  <div style="position: fixed; bottom: 10px; left: 10px; z-index: 4;">
+  <div class="controls">
     <button onclick="clearBoard()">Clear</button>
     <button onclick="toggleLock()" id="lockBtn">Lock</button>
     <input type="color" id="colorPicker" value="#000000">
@@ -165,8 +121,8 @@
     resizeCanvas();
 
     canvas.addEventListener('mousedown', e => { if(!locked){drawing = true; draw(e);} });
-    canvas.addEventListener('mouseup', () => drawing = false);
-    canvas.addEventListener('mouseout', () => drawing = false);
+    canvas.addEventListener('mouseup', () => {drawing = false; ctx.beginPath();});
+    canvas.addEventListener('mouseout', () => {drawing = false; ctx.beginPath();});
     canvas.addEventListener('mousemove', draw);
 
     function draw(e){
@@ -191,10 +147,8 @@
     /* -------- COUNTDOWNS -------- */
     function updateCountdowns(){
       const now = new Date();
-      // Christmas
       const christmas = new Date("Dec 25, 2025 00:00:00");
       updateCountdown("christmas", christmas, now);
-      // Summer
       const summer = new Date("May 29, 2026 00:00:00");
       updateCountdown("summer", summer, now);
     }
@@ -269,10 +223,27 @@
     }
     loadDailyAffirmation();
 
-    /* -------- SIDEBAR -------- */
-    function toggleSidebar(){
-      document.getElementById("sidebar").classList.toggle("collapsed");
-    }
+    /* -------- DRAGGABLE CARDS -------- */
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      let offsetX, offsetY, dragging = false;
+      card.addEventListener('mousedown', e => {
+        dragging = true;
+        offsetX = e.clientX - card.offsetLeft;
+        offsetY = e.clientY - card.offsetTop;
+        card.style.zIndex = 10;
+      });
+      document.addEventListener('mousemove', e => {
+        if(dragging){
+          card.style.left = (e.clientX - offsetX) + "px";
+          card.style.top = (e.clientY - offsetY) + "px";
+        }
+      });
+      document.addEventListener('mouseup', () => {
+        dragging = false;
+        card.style.zIndex = 2;
+      });
+    });
   </script>
 </body>
 </html>

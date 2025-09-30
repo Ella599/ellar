@@ -1,256 +1,205 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ella — School Tools</title>
-<style>
-  :root{--pink:#ff69b4;--deep:#ff1493;--bg:#ffe6f2}
-  body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--deep);padding:18px}
-  header{display:flex;align-items:center;justify-content:space-between}
-  h1{margin:4px 0 12px 0}
-  .backBtn{background:var(--deep);border:none;color:white;padding:8px 12px;border-radius:8px;cursor:pointer}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-  .box{background:white;border-radius:12px;padding:12px;border:2px solid rgba(255,20,147,0.08)}
-  input,textarea,select,button{font-family:inherit}
-  .task{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:8px;border-radius:8px;margin-bottom:8px}
-  .note-board{position:relative;height:320px;border-radius:8px;border:2px dashed #ff66b2;background:#fff0f5;overflow:hidden;padding:6px}
-  .sticky{position:absolute;background:#ffb6c1;padding:8px;width:150px;border-radius:8px;box-shadow:2px 2px 6px rgba(0,0,0,0.12)}
-  .sticky textarea{width:100%;height:80px;border:none;background:transparent;resize:none;font-family:inherit}
-  table{width:100%;border-collapse:collapse}
-  th,td{border:1px solid #ff4d94;padding:6px;text-align:center}
-  .small{font-size:13px;color:#a31860}
-  .quick-links input{width:100%}
-  .quote{font-style:italic;padding:6px;background:#fffafb;border-radius:6px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffe6f2;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #d63384;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .widget {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      flex: 1 1 400px;
+    }
+    input, button, select, textarea {
+      margin: 5px 0;
+      padding: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+      text-align: left;
+      padding: 5px;
+    }
+    .back-btn {
+      background: #d63384;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <div>
-      <button class="backBtn" onclick="location.href='index.html'">⬅ Back to Profile</button>
-    </div>
-    <div style="text-align:right">
-      <h1>📚 School Tools</h1>
-      <div class="small">All data saved in your browser (localStorage)</div>
-    </div>
-  </header>
 
-  <main class="grid" style="margin-top:12px">
-    <!-- Homework + To-Do -->
-    <div class="box">
-      <h2>Homework Tracker</h2>
-      <div style="display:flex;gap:6px">
-        <input id="taskInput" placeholder="Homework title" style="flex:1"/>
-        <input id="dateInput" type="date"/>
-        <button onclick="addTask()">Add</button>
-      </div>
-      <div id="taskList" style="margin-top:12px"></div>
+  <button class="back-btn" onclick="location.href='index.html'">⬅ Back to Profile</button>
+  <h1>📚 School Dashboard</h1>
 
-      <hr/>
-      <h3>To-Do (non-school)</h3>
-      <div style="display:flex;gap:6px">
-        <input id="todoInput" placeholder="To-do item" style="flex:1"/>
-        <button onclick="addTodo()">Add</button>
-      </div>
-      <div id="todoList" style="margin-top:10px"></div>
+  <div class="container">
+
+    <!-- To-Do List -->
+    <div class="widget">
+      <h2>📝 To-Do List</h2>
+      <input type="text" id="todoInput" placeholder="New Task">
+      <button onclick="addTodo()">Add</button>
+      <ul id="todoList"></ul>
     </div>
 
-    <!-- Calendar -->
-    <div class="box">
-      <h2>Calendar</h2>
-      <div id="calendarWrap" style="overflow:auto"></div>
+    <!-- Homework Tracker -->
+    <div class="widget">
+      <h2>📖 Homework Tracker</h2>
+      <input type="text" id="hwSubject" placeholder="Subject"><br>
+      <input type="text" id="hwDesc" placeholder="Description"><br>
+      <input type="date" id="hwDue"><br>
+      <button onclick="addHomework()">Add Homework</button>
+      <ul id="hwList"></ul>
     </div>
 
-    <!-- Schedule -->
-    <div class="box">
-      <h2>Daily Schedule</h2>
+    <!-- Daily Schedule -->
+    <div class="widget">
+      <h2>📅 Daily Schedule</h2>
       <table id="scheduleTable">
-        <tr><th>Time</th><th>Class</th><th>Action</th></tr>
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Action</th></tr>
+        </thead>
+        <tbody></tbody>
       </table>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button onclick="addRow()">➕ Add Row</button>
-        <button onclick="clearSchedule()" class="secondary">Clear</button>
-      </div>
+      <input type="text" id="timeInput" placeholder="e.g. 9:00 AM">
+      <input type="text" id="activityInput" placeholder="e.g. Math Class">
+      <button onclick="addSchedule()">Add</button>
     </div>
 
-    <!-- Sticky notes board -->
-    <div class="box">
-      <h2>Sticky Notes</h2>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <button onclick="addStickyNote()">➕ Add Note</button>
-        <button onclick="clearStickyBoard()" class="secondary">Clear Notes</button>
-      </div>
-      <div id="noteBoard" class="note-board"></div>
+    <!-- Calendar Widget -->
+    <div class="widget">
+      <h2>📆 Calendar</h2>
+      <iframe src="https://calendar.google.com/calendar/embed?mode=MONTH" style="border:0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
     </div>
 
-    <!-- Quote, quick links, weather -->
-    <div class="box">
-      <h2>Quote of the Day</h2>
-      <div id="quoteBox" class="quote"></div>
-
-      <h3 style="margin-top:12px">Quick Links</h3>
-      <div class="quick-links" style="display:flex;flex-direction:column;gap:6px">
-        <input id="link1" placeholder="School portal URL or label"/>
-        <input id="link2" placeholder="Docs/Drive URL or label"/>
-        <input id="link3" placeholder="Other quick link"/>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <button onclick="openQuickLinks()">Open</button>
-          <button onclick="saveQuickLinks()" class="secondary">Save Links</button>
-        </div>
-      </div>
-
-      <h3 style="margin-top:12px">Weather (example)</h3>
-      <div id="weatherBox" class="small">You can replace this with a real API call. Example: "Sunny, 72°F"</div>
-    </div>
-
-  </main>
+  </div>
 
 <script>
-/* ---------------- Homework Tracker (with due dates + sorting + persistence) ---------------- */
-function loadTasks(){ const tasks = JSON.parse(localStorage.getItem('tasks')||'[]'); renderTasks(tasks); }
-function saveTasks(tasks){ localStorage.setItem('tasks', JSON.stringify(tasks)); }
-function addTask(){
-  const t = document.getElementById('taskInput'); const d = document.getElementById('dateInput');
-  if(!t.value || !d.value) return;
-  const tasks = JSON.parse(localStorage.getItem('tasks')||'[]');
-  tasks.push({text:t.value,date:d.value});
-  tasks.sort((a,b)=> new Date(a.date)-new Date(b.date));
-  saveTasks(tasks); renderTasks(tasks);
-  t.value=''; d.value='';
-}
-function removeTask(i){ const tasks = JSON.parse(localStorage.getItem('tasks')||'[]'); tasks.splice(i,1); saveTasks(tasks); renderTasks(tasks); }
-function renderTasks(tasks){
-  const wrap = document.getElementById('taskList'); wrap.innerHTML='';
-  tasks.forEach((task,i)=>{
-    const due = new Date(task.date); const today = new Date(); const daysLeft = Math.ceil((due - today)/(1000*60*60*24));
-    let label = daysLeft>1? `${daysLeft} days left` : daysLeft===1? 'Due tomorrow!' : daysLeft===0? 'Due today!' : `Late by ${Math.abs(daysLeft)} days`;
-    const div = document.createElement('div'); div.className='task';
-    div.innerHTML = `<div><strong>${escapeHtml(task.text)}</strong><div class="small">📅 ${task.date} — ${label}</div></div><div><button onclick="removeTask(${i})">❌</button></div>`;
-    wrap.appendChild(div);
-  });
-}
-loadTasks();
+  /* ---------- TO-DO LIST ---------- */
+  let todos = JSON.parse(localStorage.getItem("todos") || "[]");
+  const todoList = document.getElementById("todoList");
 
-/* ---------------- To-Do list (persist) ---------------- */
-function loadTodos(){ const todos = JSON.parse(localStorage.getItem('todos')||'[]'); renderTodos(todos); }
-function saveTodos(todos){ localStorage.setItem('todos', JSON.stringify(todos)); }
-function addTodo(){
-  const t = document.getElementById('todoInput');
-  if(!t.value) return;
-  const todos = JSON.parse(localStorage.getItem('todos')||'[]');
-  todos.push({text:t.value});
-  saveTodos(todos); renderTodos(todos); t.value='';
-}
-function removeTodo(i){ const todos = JSON.parse(localStorage.getItem('todos')||'[]'); todos.splice(i,1); saveTodos(todos); renderTodos(todos); }
-function renderTodos(todos){
-  const wrap = document.getElementById('todoList'); wrap.innerHTML='';
-  todos.forEach((td,i)=>{
-    const div = document.createElement('div'); div.className='task';
-    div.innerHTML = `<div>${escapeHtml(td.text)}</div><div><button onclick="removeTodo(${i})">❌</button></div>`;
-    wrap.appendChild(div);
-  });
-}
-loadTodos();
-
-/* ---------------- Calendar (simple monthly view) ---------------- */
-function generateCalendar(){
-  const wrap = document.getElementById('calendarWrap'); const now=new Date(); const month=now.getMonth(); const year=now.getFullYear();
-  const first = new Date(year,month,1).getDay(); const days = new Date(year,month+1,0).getDate();
-  let html = '<table><tr>';
-  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=> html += `<th>${d}</th>`); html += '</tr><tr>';
-  for(let i=0;i<first;i++) html += '<td></td>';
-  for(let day=1;day<=days;day++){
-    const today = (day===now.getDate())? "style='background:#ffd1e8'":'';
-    html += `<td ${today}>${day}</td>`;
-    if((day+first)%7===0) html += '</tr><tr>';
+  function renderTodos() {
+    todoList.innerHTML = "";
+    todos.forEach((t,i) => {
+      const li = document.createElement("li");
+      li.textContent = t;
+      const del = document.createElement("button");
+      del.textContent = "❌";
+      del.onclick = () => { todos.splice(i,1); saveTodos(); };
+      li.appendChild(del);
+      todoList.appendChild(li);
+    });
   }
-  html += '</tr></table>';
-  wrap.innerHTML = html;
-}
-generateCalendar();
-
-/* ---------------- Daily Schedule (editable + add/remove + persisted) ---------------- */
-const scheduleTable = document.getElementById('scheduleTable');
-function saveSchedule(){
-  const rows = Array.from(scheduleTable.querySelectorAll('tr')).slice(1);
-  const data = rows.map(r=>[r.cells[0].textContent.trim(), r.cells[1].textContent.trim()]);
-  localStorage.setItem('schedule', JSON.stringify(data));
-}
-function loadSchedule(){
-  const saved = JSON.parse(localStorage.getItem('schedule')||'[]');
-  // clear rows
-  scheduleTable.querySelectorAll('tr:not(:first-child)').forEach(r=>r.remove());
-  if(saved.length===0){
-    // starter rows
-    addRowWith('8:00 AM','Math'); addRowWith('9:00 AM','Science'); addRowWith('10:00 AM','English'); return;
+  function addTodo() {
+    const val = document.getElementById("todoInput").value.trim();
+    if(val) {
+      todos.push(val);
+      saveTodos();
+      document.getElementById("todoInput").value="";
+    }
   }
-  saved.forEach(r=> addRowWith(r[0], r[1]));
-}
-function addRowWith(time,cls){
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td contenteditable="true">${time}</td><td contenteditable="true">${cls}</td><td><button onclick="removeRow(this)">❌</button></td>`;
-  scheduleTable.appendChild(tr);
-}
-function addRow(){ addRowWith('Time','Class'); saveSchedule(); }
-function removeRow(btn){ btn.closest('tr').remove(); saveSchedule(); }
-scheduleTable.addEventListener('input', saveSchedule);
-loadSchedule();
+  function saveTodos() {
+    localStorage.setItem("todos", JSON.stringify(todos));
+    renderTodos();
+  }
+  renderTodos();
 
-/* ---------------- Sticky Note Board (draggable & saved) ---------------- */
-const noteBoard = document.getElementById('noteBoard');
-function saveNotes(){
-  const notes = [];
-  document.querySelectorAll('.sticky').forEach(s=>{
-    notes.push({text:s.querySelector('textarea').value, left:s.style.left, top:s.style.top});
-  });
-  localStorage.setItem('stickyBoard', JSON.stringify(notes));
-}
-function loadNotes(){
-  const saved = JSON.parse(localStorage.getItem('stickyBoard')||'[]');
-  saved.forEach(n=> createSticky(n.text, n.left, n.top));
-}
-function addStickyNote(){ createSticky('', '10px', '10px'); saveNotes(); }
-function clearStickyBoard(){ document.querySelectorAll('.sticky').forEach(x=>x.remove()); saveNotes(); }
-function createSticky(text,left,top){
-  const note = document.createElement('div'); note.className='sticky';
-  note.style.left = left; note.style.top = top;
-  note.innerHTML = `<button onclick="this.parentElement.remove(); saveNotes()">❌</button><textarea>${escapeHtml(text)}</textarea>`;
-  noteBoard.appendChild(note);
-  const ta = note.querySelector('textarea'); ta.addEventListener('input', saveNotes);
-  // drag
-  note.onmousedown = e => {
-    let shiftX = e.clientX - note.getBoundingClientRect().left;
-    let shiftY = e.clientY - note.getBoundingClientRect().top;
-    function moveAt(pageX,pageY){ note.style.left = Math.max(0, Math.min(noteBoard.clientWidth - note.offsetWidth, pageX - shiftX)) + 'px'; note.style.top = Math.max(0, Math.min(noteBoard.clientHeight - note.offsetHeight, pageY - shiftY)) + 'px'; }
-    function onMouseMove(e){ moveAt(e.pageX - noteBoard.getBoundingClientRect().left, e.pageY - noteBoard.getBoundingClientRect().top); }
-    document.addEventListener('mousemove', onMouseMove);
-    note.onmouseup = ()=>{ document.removeEventListener('mousemove', onMouseMove); note.onmouseup = null; saveNotes(); };
-  };
-  note.ondragstart = ()=>false;
-}
-loadNotes();
+  /* ---------- HOMEWORK TRACKER ---------- */
+  let homework = JSON.parse(localStorage.getItem("homework") || "[]");
+  const hwList = document.getElementById("hwList");
 
-/* ---------------- Quote of the Day ---------------- */
-const quotes = [
-  "The secret to getting ahead is getting started.",
-  "Small steps every day — that’s progress.",
-  "You are capable of amazing things.",
-  "Mistakes are proof you’re trying.",
-  "Focus on progress, not perfection."
-];
-document.getElementById('quoteBox').innerText = quotes[(new Date()).getDate() % quotes.length];
+  function renderHomework() {
+    hwList.innerHTML = "";
+    homework.forEach((h,i) => {
+      const li = document.createElement("li");
+      const due = new Date(h.due).getTime();
+      const now = new Date().getTime();
+      const diff = due - now;
+      const days = Math.floor(diff / (1000*60*60*24));
+      li.textContent = `${h.subject}: ${h.desc} (Due: ${h.due}, ${days} days left)`;
+      const del = document.createElement("button");
+      del.textContent = "❌";
+      del.onclick = () => { homework.splice(i,1); saveHomework(); };
+      li.appendChild(del);
+      hwList.appendChild(li);
+    });
+  }
+  function addHomework() {
+    const subject = document.getElementById("hwSubject").value.trim();
+    const desc = document.getElementById("hwDesc").value.trim();
+    const due = document.getElementById("hwDue").value;
+    if(subject && desc && due) {
+      homework.push({subject, desc, due});
+      saveHomework();
+      document.getElementById("hwSubject").value="";
+      document.getElementById("hwDesc").value="";
+      document.getElementById("hwDue").value="";
+    }
+  }
+  function saveHomework() {
+    localStorage.setItem("homework", JSON.stringify(homework));
+    renderHomework();
+  }
+  renderHomework();
 
-/* ---------------- Quick Links (save & open) ---------------- */
-function saveQuickLinks(){ const links=[document.getElementById('link1').value, document.getElementById('link2').value, document.getElementById('link3').value]; localStorage.setItem('quickLinks', JSON.stringify(links)); alert('Quick links saved'); }
-function openQuickLinks(){ const links = JSON.parse(localStorage.getItem('quickLinks')||'[]'); links.forEach(l=>{ if(!l) return; try{ window.open(l,'_blank'); } catch(e){} }); }
-(function loadQuick(){ const l = JSON.parse(localStorage.getItem('quickLinks')||'[]'); if(l.length){ document.getElementById('link1').value = l[0]||''; document.getElementById('link2').value = l[1]||''; document.getElementById('link3').value = l[2]||''; }})();
+  /* ---------- DAILY SCHEDULE ---------- */
+  let schedule = JSON.parse(localStorage.getItem("schedule") || "[]");
+  const tableBody = document.querySelector("#scheduleTable tbody");
 
-/* ---------------- Weather placeholder ---------------- */
-document.getElementById('weatherBox').innerText = 'Sunny · 72°F (example). Replace with real API key if desired.';
-
-/* ---------------- Utilities & load initial persisted data ---------------- */
-function escapeHtml(unsafe){ return unsafe.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-(function init(){ loadTasks(); loadTodos(); generateCalendar(); loadSchedule(); loadNotes(); })();
+  function renderSchedule() {
+    tableBody.innerHTML = "";
+    schedule.forEach((s,i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${s.time}</td><td>${s.activity}</td>`;
+      const td = document.createElement("td");
+      const del = document.createElement("button");
+      del.textContent = "❌";
+      del.onclick = () => { schedule.splice(i,1); saveSchedule(); };
+      td.appendChild(del);
+      tr.appendChild(td);
+      tableBody.appendChild(tr);
+    });
+  }
+  function addSchedule() {
+    const time = document.getElementById("timeInput").value.trim();
+    const activity = document.getElementById("activityInput").value.trim();
+    if(time && activity) {
+      schedule.push({time, activity});
+      saveSchedule();
+      document.getElementById("timeInput").value="";
+      document.getElementById("activityInput").value="";
+    }
+  }
+  function saveSchedule() {
+    localStorage.setItem("schedule", JSON.stringify(schedule));
+    renderSchedule();
+  }
+  renderSchedule();
 </script>
+
 </body>
 </html>

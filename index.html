@@ -1,479 +1,476 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ella Fehlauer — Profile</title>
-<!-- Three.js for 3D pet -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-<style>
-  :root{
-    --pink:#ff69b4; --deep:#ff1493; --light:#ffe4f2;
-    --purple:#a020f0; --teal:#20c5b6;
-  }
-  html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--light);color:var(--deep);}
-  header{
-    display:flex;align-items:center;gap:12px;padding:12px 16px;
-    background:linear-gradient(90deg,#ffd6e8,#fff0f5);box-shadow:0 2px 6px rgba(0,0,0,0.06);position:relative;z-index:50;
-  }
-  #profilePic{width:92px;height:92px;border-radius:50%;object-fit:cover;border:3px solid var(--deep)}
-  #name{font-size:20px;font-weight:700;color:var(--deep)}
-  #top-controls{margin-left:auto;display:flex;gap:8px;align-items:center}
-  #top-controls input[type=file]{display:inline-block}
-  button,input,select{font-family:inherit}
-  button{background:var(--deep);color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
-  button.secondary{background:white;color:var(--deep);border:2px solid var(--deep)}
-  .subheader{display:flex;justify-content:space-between;padding:10px 16px;background:#fff0f7;border-bottom:1px solid rgba(0,0,0,0.03)}
-  .countdownBox{display:flex;gap:10px;align-items:center}
-  .count{background:rgba(255,255,255,0.9);padding:8px;border-radius:8px;border:2px solid rgba(255,20,147,0.08);min-width:240px}
-  /* whiteboard area */
-  #whiteboard-wrap{position:relative;height:62vh;background:#fff0f5;overflow:hidden}
-  #board{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
-  /* toolbar bottom-left */
-  #wb-controls{position:absolute;left:12px;bottom:12px;z-index:40;background:rgba(255,255,255,0.95);padding:8px;border-radius:10px;border:2px solid rgba(255,20,147,0.12);display:flex;gap:8px;align-items:center}
-  #wb-controls label{font-size:13px;color:var(--deep)}
-  /* sparkles and hearts */
-  .sparkle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:1000;mix-blend-mode:screen;opacity:0.9}
-  .heart{position:fixed;font-size:20px;pointer-events:none;z-index:900;opacity:0.9}
-  /* right column panels */
-  .right-panel{position:absolute;right:16px;top:18vh;z-index:30;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
-  .panel{background:rgba(255,255,255,0.95);padding:10px;border-radius:10px;border:2px solid rgba(255,20,147,0.08);min-width:220px}
-  /* pet container */
-  #petWrap{width:260px;height:220px;display:block}
-  /* inspiration */
-  #inspiration{padding:10px;text-align:center;font-style:italic;color:#9f145d}
-  /* sticky notes mini */
-  .note{position:absolute;background:#fff3fb;border:2px solid #ffb6d6;padding:8px;border-radius:8px;cursor:move;min-width:120px;box-shadow:2px 2px 6px rgba(0,0,0,0.12)}
-  /* footer */
-  footer{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#ffccdd;gap:8px;flex-wrap:wrap}
-  audio{height:40px}
-  @media(max-width:900px){
-    .right-panel{display:none}
-    #wb-controls{left:8px;bottom:8px}
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ella Fehlauer — Profile</title>
+  <style>
+    :root {
+      --pink: #ff69b4;
+      --deep: #ff1493;
+      --light: #ffe4f2;
+      --purple: #a020f0;
+      --teal: #20c5b6;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: var(--light);
+      color: var(--deep);
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      background: linear-gradient(90deg, #ffd6e8, #fff0f5);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      position: relative;
+      z-index: 50;
+    }
+    #profilePic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid white;
+      object-fit: cover;
+      margin-right: 16px;
+    }
+    #name {
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+    }
+    #top-controls {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    #top-controls input[type="file"] {
+      display: inline-block;
+    }
+    button, select, input {
+      font-family: inherit;
+    }
+    button {
+      background: var(--deep);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: white;
+      color: var(--deep);
+      border: 2px solid var(--deep);
+    }
+    select {
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid var(--deep);
+    }
+    .subheader {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #fff0f7;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .inspiration {
+      font-style: italic;
+      color: #7a0b4f;
+    }
+    .countdowns {
+      display: flex;
+      gap: 12px;
+    }
+    .count {
+      background: rgba(255,255,255,0.9);
+      padding: 8px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,20,147,0.08);
+      min-width: 200px;
+      text-align: center;
+    }
+    .count strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    #whiteboard-wrap {
+      position: relative;
+      background: #fff0f5;
+      height: 60vh;
+      border-top: 2px solid white;
+    }
+    #board {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    #wb-controls {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 40;
+      background: rgba(255,255,255,0.95);
+      padding: 8px;
+      border-radius: 10px;
+      border: 2px solid rgba(255,20,147,0.12);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    #wb-controls label {
+      font-size: 13px;
+      color: var(--deep);
+    }
+    #petArea {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      width: 180px;
+      height: 180px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      border: 2px solid rgba(255,20,147,0.12);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      z-index: 30;
+    }
+    #petDog {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: #ffccdd;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    audio {
+      height: 36px;
+    }
+  </style>
 </head>
 <body>
   <header>
     <img id="profilePic" src="Screenshot 2025-09-25 082821.png" alt="Profile">
-    <div>
-      <div id="name">Ella Fehlauer</div>
-      <div style="font-size:12px;color:#a31860">Personal profile — make it yours!</div>
-    </div>
-
+    <div id="name">Ella Fehlauer</div>
     <div id="top-controls">
       <input id="picUpload" type="file" accept="image/*" title="Upload profile picture">
-      <button id="avatarBtn" class="secondary" title="Use a cute avatar">Use Avatar</button>
-      <select id="themeSelect" title="Site theme">
+      <button id="avatarBtn" class="secondary" title="Use avatar">Avatar</button>
+      <select id="themeSelect" title="Theme">
         <option value="pink">Pink</option>
         <option value="purple">Purple</option>
         <option value="teal">Teal</option>
         <option value="rainbow">Rainbow</option>
       </select>
-      <button id="schoolBtn">📚 School Tools</button>
+      <button id="schoolBtn">School Tools</button>
     </div>
   </header>
 
   <div class="subheader">
-    <div id="inspiration">
-      <div id="quote">—</div>
-      <div style="margin-top:6px"><button id="affirmBtn">Daily Affirmation</button> <span id="affirmation" style="margin-left:8px;font-weight:600;"></span></div>
+    <div class="inspiration">
+      <div id="quote">“…”</div>
+      <div style="margin-top:6px">
+        <button id="affirmBtn">Daily Affirmation</button>
+        <span id="affirmation"></span>
+      </div>
     </div>
-    <div class="countdownBox" style="gap:12px">
-      <div class="count"><strong>☀️ Summer Vacation!</strong><div id="summerTimer">—</div></div>
-      <div class="count"><strong>🎄 Christmas!</strong><div id="christmasTimer">—</div></div>
+    <div class="countdowns">
+      <div class="count"><strong>☀️ Summer Vacation</strong><div id="summerTimer">—</div></div>
+      <div class="count"><strong>🎄 Christmas</strong><div id="christmasTimer">—</div></div>
     </div>
   </div>
 
-  <!-- whiteboard -->
   <div id="whiteboard-wrap">
     <canvas id="board"></canvas>
-
-    <!-- whiteboard controls bottom-left (out of the way) -->
     <div id="wb-controls">
       <label for="colorPicker">Color</label>
       <input id="colorPicker" type="color" value="#ff4d94">
       <label for="brushSize">Size</label>
-      <input id="brushSize" type="range" min="1" max="40" value="6" style="width:90px">
+      <input id="brushSize" type="range" min="1" max="40" value="6">
       <button id="eraserBtn" class="secondary">Eraser</button>
       <button id="clearBtn">Clear</button>
       <button id="downloadBtn" class="secondary">Save PNG</button>
-      <button id="stickerBtn">Add Sticker</button>
+      <button id="stickerBtn">Sticker</button>
     </div>
-
-    <!-- right side panels: pet + sticky note quick add -->
-    <div class="right-panel">
-      <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong>Pet (dog)</strong></div>
-          <div style="font-size:12px;color:#a31860">Click pet to play</div>
-        </div>
-        <div id="petWrap"></div>
-        <div style="display:flex;gap:6px;margin-top:8px">
-          <input id="petUpload" type="file" accept=".glb,.gltf" title="Replace pet model (optional)" />
-          <button id="feedBtn">🍖 Feed</button>
-          <button id="resetPet" class="secondary">Reset</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <strong>Sticky Notes</strong>
-        <div style="margin-top:8px">
-          <button id="addNoteBtn">➕ Add Note</button>
-          <button id="clearNotesBtn" class="secondary">Clear Notes</button>
-        </div>
-      </div>
+    <div id="petArea">
+      <img id="petDog" src="https://i.imgur.com/Z8rXWbw.gif" alt="Wagging dog GIF">
+      <!-- The src URL above is a public wagging dog GIF from Imgur. You can replace it later -->
     </div>
   </div>
 
   <footer>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button id="themeToggle">Change Theme</button>
-      <button id="showCompliment" class="secondary">Random Compliment</button>
-      <div id="complimentBox" style="font-weight:600;color:#92204b;margin-left:8px"></div>
-    </div>
+    <button id="themeToggle">Change Theme</button>
+    <button id="showCompliment" class="secondary">Compliment</button>
+    <span id="complimentBox"></span>
 
     <div style="display:flex;align-items:center;gap:8px">
       <audio id="bgAudio" controls>
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-        Your browser doesn't support audio
+        Your browser doesn't support audio.
       </audio>
-      <button id="downloadProfile" class="secondary">Download Profile (PNG)</button>
+      <button id="downloadProfile" class="secondary">Save Board</button>
     </div>
   </footer>
 
 <script>
-/* ------------------- Profile pic upload & avatar ------------------- */
-const profilePic = document.getElementById('profilePic');
-const picUpload = document.getElementById('picUpload');
-const avatarBtn = document.getElementById('avatarBtn');
-const savedPic = localStorage.getItem('profilePic');
-if(savedPic) profilePic.src = savedPic;
-picUpload.addEventListener('change', () => {
-  const f = picUpload.files[0]; if(!f) return;
-  const r = new FileReader();
-  r.onload = e => { profilePic.src = e.target.result; localStorage.setItem('profilePic', e.target.result); }
-  r.readAsDataURL(f);
-});
-avatarBtn.addEventListener('click', () => {
-  const url = 'https://i.ibb.co/4Y3mJrh/avatar.png'; // sample avatar (replaceable)
-  profilePic.src = url; localStorage.setItem('profilePic', url);
-});
-
-/* ------------------- Quotes & Affirmations ------------------- */
-const quotes = [
-  "Believe in yourself and all that you are.",
-  "Every day is a fresh start — make it count.",
-  "Dream big and dare to begin.",
-  "Small steps every day add up to big change.",
-  "You are stronger than you think."
-];
-document.getElementById('quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
-const affirmations = [
-  "You are capable of amazing things.",
-  "Keep shining — the world needs you.",
-  "Today, you will make progress.",
-  "You are creative, kind and courageous.",
-  "Take a deep breath — you've got this."
-];
-document.getElementById('affirmBtn').addEventListener('click', () => {
-  document.getElementById('affirmation').innerText = affirmations[Math.floor(Math.random()*affirmations.length)];
-});
-
-/* ------------------- Compliments ------------------- */
-const compliments = ["You're amazing! 💕","Keep shining! ✨","You can do it! 🌟","Smiles suit you 😊","You're doing great! 💖"];
-document.getElementById('showCompliment').addEventListener('click', () => {
-  document.getElementById('complimentBox').innerText = compliments[Math.floor(Math.random()*compliments.length)];
-});
-
-/* ------------------- Whiteboard (continuous strokes) ------------------- */
-const canvas = document.getElementById('board');
-const ctx = canvas.getContext('2d');
-const colorPicker = document.getElementById('colorPicker');
-const brushSize = document.getElementById('brushSize');
-const eraserBtn = document.getElementById('eraserBtn');
-const clearBtn = document.getElementById('clearBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const stickerBtn = document.getElementById('stickerBtn');
-
-function resizeCanvas(){ const wrap = document.getElementById('whiteboard-wrap'); canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
-let drawing=false, erasing=false;
-let lastX=0, lastY=0;
-
-canvas.addEventListener('pointerdown', (e)=>{ drawing=true; const r=canvas.getBoundingClientRect(); lastX = e.clientX - r.left; lastY = e.clientY - r.top; ctx.beginPath(); ctx.moveTo(lastX,lastY); });
-canvas.addEventListener('pointerup', ()=>{ drawing=false; ctx.beginPath(); });
-canvas.addEventListener('pointerleave', ()=>{ drawing=false; ctx.beginPath(); });
-canvas.addEventListener('pointermove', (e)=> {
-  if(!drawing) return;
-  const r=canvas.getBoundingClientRect();
-  const x = e.clientX - r.left, y = e.clientY - r.top;
-  if(erasing){
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.lineWidth = brushSize.value;
-    ctx.lineCap = 'round';
-    ctx.lineTo(x,y);
-    ctx.stroke();
-  } else {
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = colorPicker.value;
-    ctx.lineWidth = brushSize.value;
-    ctx.lineCap = 'round';
-    ctx.lineTo(x,y);
-    ctx.stroke();
-  }
-  ctx.beginPath();
-  ctx.moveTo(x,y);
-});
-
-eraserBtn.addEventListener('click', ()=>{ erasing = !erasing; eraserBtn.textContent = erasing ? 'Eraser ✓' : 'Eraser'; });
-clearBtn.addEventListener('click', ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); });
-downloadBtn.addEventListener('click', ()=> {
-  const data = canvas.toDataURL('image/png'); const a = document.createElement('a'); a.href = data; a.download = 'doodle.png'; a.click();
-});
-
-/* sticker: place a small heart sticker at a random place on canvas */
-stickerBtn.addEventListener('click', ()=> {
-  const r = canvas.getBoundingClientRect();
-  const x = Math.random()*(r.width-40)+20;
-  const y = Math.random()*(r.height-40)+20;
-  ctx.save();
-  ctx.font = '40px serif';
-  ctx.fillText('💖', x, y);
-  ctx.restore();
-});
-
-/* ------------------- Sparkle cursor (small visual) ------------------- */
-document.addEventListener('mousemove', e => {
-  const el = document.createElement('div'); el.className='sparkle';
-  el.style.left = (e.pageX-3)+'px'; el.style.top = (e.pageY-3)+'px';
-  el.style.background = colorPicker.value;
-  document.body.appendChild(el); setTimeout(()=>el.remove(),700);
-});
-
-/* ------------------- Floating hearts (decor) ------------------- */
-setInterval(()=> {
-  const h = document.createElement('div'); h.className='heart'; h.innerText='💖';
-  h.style.left = Math.random()*(window.innerWidth-40)+'px'; h.style.top = (window.innerHeight+10)+'px';
-  h.style.transition = 'transform 5s linear, opacity 5s linear';
-  document.body.appendChild(h);
-  requestAnimationFrame(()=> { h.style.transform = `translateY(-${window.innerHeight+100}px)`; h.style.opacity='0'; });
-  setTimeout(()=>h.remove(),5200);
-}, 3000);
-
-/* ------------------- Countdown timers (exact dates) ------------------- */
-function getNext(target){ // returns Date of target (if target is past for the year, adjust)
-  return new Date(target);
-}
-function formatDiff(target, includeYears=false){
-  const now = new Date(); let diff = target - now; if(diff<=0) return "It's here!";
-  const years = includeYears ? Math.floor(diff/(1000*60*60*24*365.25)) : 0;
-  const months = Math.floor((diff/(1000*60*60*24*30.44))%12);
-  const days = Math.floor((diff/(1000*60*60*24))%30.44);
-  const hours = Math.floor((diff/(1000*60*60))%24);
-  const minutes = Math.floor((diff/(1000*60))%60);
-  const seconds = Math.floor((diff/1000)%60);
-  return (includeYears? years + 'y, ' : '') + `${months}mo ${days}d ${hours}h ${minutes}m ${seconds}s`;
-}
-function updateTimers(){
-  const christmas = getNext(new Date('2025-12-25T00:00:00'));
-  const summer   = getNext(new Date('2026-05-29T00:00:00'));
-  document.getElementById('christmasTimer').innerText = formatDiff(christmas,false);
-  document.getElementById('summerTimer').innerText = formatDiff(summer,true);
-}
-setInterval(updateTimers,1000); updateTimers();
-
-/* ------------------- 3D Dog (procedural primitives) ------------------- */
-const petWrap = document.getElementById('petWrap');
-let scene, cam, renderer, petGroup, clock;
-initPet(); animatePet();
-
-function initPet(){
-  // three scene
-  scene = new THREE.Scene();
-  cam = new THREE.PerspectiveCamera(45, petWrap.clientWidth/petWrap.clientHeight, 0.1, 1000);
-  cam.position.set(0,1.2,3);
-  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
-  renderer.setSize(petWrap.clientWidth, petWrap.clientHeight);
-  petWrap.innerHTML=''; petWrap.appendChild(renderer.domElement);
-  const ambient = new THREE.AmbientLight(0xffffff,0.8); scene.add(ambient);
-  const dir = new THREE.DirectionalLight(0xffffff,0.6); dir.position.set(5,10,7); scene.add(dir);
-
-  petGroup = new THREE.Group(); scene.add(petGroup);
-
-  // materials
-  const bodyMat = new THREE.MeshStandardMaterial({color:0xffc9a8, roughness:0.7});
-  const darkMat = new THREE.MeshStandardMaterial({color:0x8b5a3c});
-  const eyeMat = new THREE.MeshStandardMaterial({color:0x0b0b0b});
-
-  // body
-  const body = new THREE.Mesh(new THREE.SphereGeometry(0.6,32,20), bodyMat);
-  body.scale.set(1.6,1.0,1.0); body.position.set(0,0.5,0); petGroup.add(body);
-
-  // head
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.36,24,20), bodyMat); head.position.set(0.95,0.95,0); petGroup.add(head);
-  const snout = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.45,12), bodyMat); snout.rotation.z = Math.PI/2; snout.position.set(1.26,0.94,0); petGroup.add(snout);
-  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.07,12,8), darkMat); nose.position.set(1.48,0.94,0); petGroup.add(nose);
-  // ears
-  const earL = new THREE.Mesh(new THREE.ConeGeometry(0.12,0.28,10), darkMat); earL.position.set(0.95,1.28,0.14); earL.rotation.z = 0.45; petGroup.add(earL);
-  const earR = earL.clone(); earR.position.set(0.95,1.28,-0.14); earR.rotation.z = -0.45; petGroup.add(earR);
-  // legs
-  for(let i=-1;i<=1;i+=2){
-    for(let j=0;j<2;j++){
-      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.6,10), bodyMat);
-      leg.position.set(i*0.5,0.15,(j-0.5)*0.35); petGroup.add(leg);
-    }
-  }
-  // tail
-  const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.6,8), darkMat);
-  tail.position.set(-1.05,0.75,0); tail.rotation.z = Math.PI/3; petGroup.add(tail);
-  // eyes
-  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8), eyeMat); eyeL.position.set(1.02,1.02,0.12); petGroup.add(eyeL);
-  const eyeR = eyeL.clone(); eyeR.position.set(1.02,1.02,-0.12); petGroup.add(eyeR);
-
-  petGroup.rotation.y = -0.6;
-  clock = new THREE.Clock();
-  window.addEventListener('resize', ()=>{ renderer.setSize(petWrap.clientWidth, petWrap.clientHeight); cam.aspect = petWrap.clientWidth / petWrap.clientHeight; cam.updateProjectionMatrix(); });
-}
-
-let feedInProgress=false;
-function petJump(){ // small jump + wag
-  if(!petGroup) return;
-  feedInProgress = true;
-  const start = performance.now();
-  const dur = 700;
-  (function anim(){
-    const t = performance.now()-start;
-    const p = Math.min(1,t/dur);
-    petGroup.position.y = Math.sin(Math.PI * p) * 0.6;
-    petGroup.rotation.y += 0.12 * Math.sin(p*Math.PI*4); // wiggle
-    if(p<1) requestAnimationFrame(anim); else { petGroup.position.y=0; feedInProgress=false; }
-  })();
-}
-
-function animatePet(){
-  requestAnimationFrame(animatePet);
-  const t = clock.getElapsedTime();
-  petGroup.rotation.y += 0.003;
-  if(!feedInProgress) petGroup.position.y = 0.04 * Math.sin(t*2);
-  renderer.render(scene,cam);
-}
-
-/* clicking the pet area also animates */
-petWrap.addEventListener('click', ()=> petJump());
-
-/* feed button: show falling treat and animate pet */
-document.getElementById('feedBtn').addEventListener('click', ()=> {
-  // visual treat drop (emoji)
-  const treat = document.createElement('div'); treat.innerText='🍖';
-  treat.style.position='fixed'; treat.style.right='80px'; treat.style.bottom='240px'; treat.style.fontSize='28px'; treat.style.zIndex='9999';
-  document.body.appendChild(treat);
-  // animate falling toward pet
-  const targetRect = petWrap.getBoundingClientRect();
-  const tx = targetRect.left + targetRect.width/2;
-  const ty = targetRect.top + targetRect.height/2;
-  let start = null;
-  const startX = window.innerWidth - 80, startY = window.innerHeight - 60;
-  function fall(ts){
-    if(!start) start=ts;
-    const p = Math.min(1,(ts-start)/700);
-    treat.style.right = (window.innerWidth - (startX + (tx-startX)*p)) + 'px';
-    treat.style.bottom = (window.innerHeight - (startY + (ty-startY)*p)) + 'px';
-    treat.style.transform = `scale(${1 - 0.3*p})`;
-    if(p<1) requestAnimationFrame(fall); else {
-      setTimeout(()=>{ treat.remove(); petJump(); }, 80);
-    }
-  }
-  requestAnimationFrame(fall);
-});
-
-/* pet reset (rebuild) */
-document.getElementById('resetPet').addEventListener('click', ()=> { if(scene && petGroup){ scene.remove(petGroup); initPet(); } });
-
-/* NOTE: petUpload is accepted but loading a local .glb would require GLTFLoader + file->arraybuffer parsing. That is prepared as a future enhancement. */
-
-/* ------------------- Sticky notes board (saved & draggable) ------------------- */
-const addNoteBtn = document.getElementById('addNoteBtn');
-const noteBoard = document.getElementById('whiteboard-wrap');
-const clearNotesBtn = document.getElementById('clearNotesBtn');
-
-function saveNotes(){
-  const arr = [];
-  document.querySelectorAll('.note').forEach(n => {
-    arr.push({text: n.querySelector('textarea').value, left: n.style.left, top: n.style.top});
+  /* ---------- Profile pic upload & avatar ---------- */
+  const profilePic = document.getElementById('profilePic');
+  const picUpload = document.getElementById('picUpload');
+  const avatarBtn = document.getElementById('avatarBtn');
+  const savedPic = localStorage.getItem('profilePic');
+  if (savedPic) profilePic.src = savedPic;
+  picUpload.addEventListener('change', () => {
+    const f = picUpload.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      profilePic.src = e.target.result;
+      localStorage.setItem('profilePic', e.target.result);
+    };
+    reader.readAsDataURL(f);
   });
-  localStorage.setItem('notesBoard', JSON.stringify(arr));
-}
-function loadNotes(){
-  const arr = JSON.parse(localStorage.getItem('notesBoard') || '[]');
-  arr.forEach(n => createNote(n.text, n.left, n.top));
-}
-function createNote(text='Note', left='40px', top='40px'){
-  const n = document.createElement('div'); n.className='note';
-  n.style.left = left; n.style.top = top;
-  n.innerHTML = `<button style="float:right" onclick="this.parentElement.remove(); saveNotes()">✖</button>
-                 <textarea style="width:100%;height:80px;border:none;background:transparent">${text}</textarea>`;
-  noteBoard.appendChild(n);
-  const ta = n.querySelector('textarea');
-  ta.addEventListener('input', saveNotes);
+  avatarBtn.addEventListener('click', () => {
+    const avatarURL = 'https://i.ibb.co/4Y3mJrh/avatar.png';  // sample avatar
+    profilePic.src = avatarURL;
+    localStorage.setItem('profilePic', avatarURL);
+  });
 
-  // drag
-  n.onmousedown = e => {
-    const rect = noteBoard.getBoundingClientRect();
-    let shiftX = e.clientX - n.getBoundingClientRect().left;
-    let shiftY = e.clientY - n.getBoundingClientRect().top;
-    function moveAt(pageX,pageY){
-      n.style.left = Math.max(0, Math.min(rect.width - n.offsetWidth, pageX - rect.left - shiftX)) + 'px';
-      n.style.top  = Math.max(0, Math.min(rect.height - n.offsetHeight, pageY - rect.top - shiftY)) + 'px';
+  /* ---------- Quotes & Affirmations ---------- */
+  const quotes = [
+    "Believe in yourself and all you are.",
+    "Every day is a new opportunity.",
+    "Dream big, start small.",
+    "You are stronger than you know.",
+    "Small steps lead to big changes."
+  ];
+  document.getElementById('quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+  const affirmations = [
+    "You are amazing just as you are.",
+    "You’ve got this!",
+    "Keep going, you're doing great.",
+    "Your future is bright.",
+    "Be proud of how far you’ve come."
+  ];
+  document.getElementById('affirmBtn').addEventListener('click', () => {
+    document.getElementById('affirmation').innerText =
+      affirmations[Math.floor(Math.random()*affirmations.length)];
+  });
+
+  /* ---------- Compliments ---------- */
+  const compliments = ["You rock! 💖","Keep shining! ✨","Unstoppable you!","Smiles suit you 😊","You make magic happen."];
+  document.getElementById('showCompliment').addEventListener('click', () => {
+    document.getElementById('complimentBox').innerText =
+      compliments[Math.floor(Math.random()*compliments.length)];
+  });
+
+  /* ---------- Whiteboard ---------- */
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  const colorPicker = document.getElementById('colorPicker');
+  const brushSize = document.getElementById('brushSize');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const stickerBtn = document.getElementById('stickerBtn');
+
+  function resizeCanvas(){
+    const wrap = document.getElementById('whiteboard-wrap');
+    canvas.width = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  let drawing = false, erasing = false;
+  canvas.addEventListener('pointerdown', e => {
+    drawing = true;
+    const r = canvas.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+  });
+  canvas.addEventListener('pointerup', () => {
+    drawing = false;
+    ctx.beginPath();
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!drawing) return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    if (erasing) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = brushSize.value;
+      ctx.lineCap = 'round';
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = brushSize.value;
+      ctx.lineCap = 'round';
+      ctx.lineTo(x, y);
+      ctx.stroke();
     }
-    function onMouseMove(e){ moveAt(e.pageX,e.pageY); }
-    document.addEventListener('mousemove', onMouseMove);
-    n.onmouseup = ()=> { document.removeEventListener('mousemove', onMouseMove); n.onmouseup=null; saveNotes(); };
-  };
-  n.ondragstart = ()=> false;
-}
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  });
 
-addNoteBtn.addEventListener('click', ()=> { createNote('', '20px', '20px'); saveNotes(); });
-clearNotesBtn.addEventListener('click', ()=> { document.querySelectorAll('.note').forEach(x=>x.remove()); saveNotes(); });
-loadNotes();
+  eraserBtn.addEventListener('click', () => {
+    erasing = !erasing;
+    eraserBtn.textContent = erasing ? 'Eraser ✓' : 'Eraser';
+  });
+  clearBtn.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+  downloadBtn.addEventListener('click', () => {
+    const data = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = data;
+    a.download = 'whiteboard.png';
+    a.click();
+  });
+  stickerBtn.addEventListener('click', () => {
+    const r = canvas.getBoundingClientRect();
+    const x = Math.random() * (r.width - 40) + 20;
+    const y = Math.random() * (r.height - 40) + 20;
+    ctx.save();
+    ctx.font = '36px serif';
+    ctx.fillText('💖', x, y);
+    ctx.restore();
+  });
 
-/* ------------------- Theme select & toggle ------------------- */
-const themeSelect = document.getElementById('themeSelect');
-const themeToggle = document.getElementById('themeToggle');
-const savedTheme = localStorage.getItem('siteTheme') || 'pink';
-themeSelect.value = savedTheme; applyTheme(savedTheme);
-themeSelect.addEventListener('change', ()=> { applyTheme(themeSelect.value); localStorage.setItem('siteTheme', themeSelect.value); });
-themeToggle.addEventListener('click', ()=> {
-  const opts = ['pink','purple','teal','rainbow'];
-  const idx = (opts.indexOf(themeSelect.value) + 1) % opts.length;
-  themeSelect.value = opts[idx];
-  applyTheme(opts[idx]);
-  localStorage.setItem('siteTheme', opts[idx]);
-});
-function applyTheme(name){
-  document.body.style.background = (name==='pink'? 'var(--light)' : name==='purple'? '#f6e9ff' : name==='teal'? '#e8fffb' : 'linear-gradient(90deg,#ffe4f2,#fff0f5,#e8f8ff,#fff3e6)');
-  document.documentElement.style.setProperty('--deep', name==='purple'? 'var(--purple)' : name==='teal'? 'var(--teal)' : 'var(--deep)');
-}
+  /* ---------- Countdown Timers ---------- */
+  function formatDiff(target, includeYears=false) {
+    const now = new Date();
+    let diff = target - now;
+    if (diff <= 0) return "It's here!";
+    const years = includeYears ? Math.floor(diff/(1000*60*60*24*365.25)) : 0;
+    const months = Math.floor((diff/(1000*60*60*24*30.44))%12);
+    const days = Math.floor((diff/(1000*60*60*24))%30.44);
+    const hours = Math.floor((diff/(1000*60*60))%24);
+    const minutes = Math.floor((diff/(1000*60))%60);
+    const seconds = Math.floor((diff/1000)%60);
+    return (includeYears ? years + 'y, ' : '') + `${months}mo ${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+  function updateTimers(){
+    const christmas = new Date('2025-12-25T00:00:00');
+    const summer = new Date('2026-05-29T00:00:00');
+    document.getElementById('christmasTimer').innerText = formatDiff(christmas, false);
+    document.getElementById('summerTimer').innerText = formatDiff(summer, true);
+  }
+  setInterval(updateTimers, 1000);
+  updateTimers();
 
-/* ------------------- Compliment helper displayed earlier ------------------- */
-/* set compliment box initially empty */
+  /* ---------- Pet Interaction (2D dog GIF) ---------- */
+  const petDog = document.getElementById('petDog');
+  petDog.addEventListener('click', () => {
+    petDog.style.transform = 'translateY(-20px)';
+    setTimeout(() => { petDog.style.transform = 'translateY(0)'; }, 300);
+  });
 
-/* ------------------- School page button (link) ------------------- */
-document.getElementById('schoolBtn').addEventListener('click', ()=> location.href='school.html');
+  document.getElementById('feedBtn').addEventListener('click', () => {
+    // drop a treat emoji
+    const treat = document.createElement('div');
+    treat.innerText = '🍖';
+    treat.style.position = 'fixed';
+    treat.style.right = '100px';
+    treat.style.bottom = '250px';
+    treat.style.fontSize = '28px';
+    treat.style.zIndex = '9999';
+    document.body.appendChild(treat);
 
-/* ------------------- Download profile snapshot (basic) ------------------- */
-document.getElementById('downloadProfile').addEventListener('click', ()=> {
-  // simple: download whiteboard as PNG + profile pic not combined; for full page snapshot you'd need html2canvas
-  const data = canvas.toDataURL('image/png'); const a = document.createElement('a'); a.href=data; a.download='whiteboard.png'; a.click();
-});
+    const petRect = petDog.getBoundingClientRect();
+    const targetX = petRect.left + petRect.width / 2;
+    const targetY = petRect.top + petRect.height / 2;
 
-/* ------------------- Initialize a few things ------------------- */
-document.getElementById('complimentBox').innerText = compliments[Math.floor(Math.random()*compliments.length)];
-// pet initial: done in initPet/animatePet already
+    let start = null;
+    const startX = window.innerWidth - 100;
+    const startY = window.innerHeight - 80;
 
-// small visual readiness
-console.log('Profile page loaded with full features.');
+    function animateTreat(ts) {
+      if (!start) start = ts;
+      const p = Math.min(1, (ts - start) / 700);
+      treat.style.right = (window.innerWidth - (startX + (targetX - startX) * p)) + 'px';
+      treat.style.bottom = (window.innerHeight - (startY + (targetY - startY) * p)) + 'px';
+      treat.style.transform = `scale(${1 - 0.3 * p})`;
+      if (p < 1) requestAnimationFrame(animateTreat);
+      else {
+        setTimeout(() => { treat.remove(); petDog.click(); }, 80);
+      }
+    }
+    requestAnimationFrame(animateTreat);
+  });
+
+  /* ---------- Theme Toggle & Select ---------- */
+  const themeSelect = document.getElementById('themeSelect');
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('siteTheme') || 'pink';
+  themeSelect.value = stored;
+  applyTheme(stored);
+  themeSelect.addEventListener('change', () => {
+    applyTheme(themeSelect.value);
+    localStorage.setItem('siteTheme', themeSelect.value);
+  });
+  themeToggle.addEventListener('click', () => {
+    const opts = ['pink','purple','teal','rainbow'];
+    const idx = (opts.indexOf(themeSelect.value) + 1) % opts.length;
+    themeSelect.value = opts[idx];
+    applyTheme(opts[idx]);
+    localStorage.setItem('siteTheme', opts[idx]);
+  });
+  function applyTheme(name) {
+    if (name === 'pink') {
+      document.body.style.background = varOr('--light');
+      document.documentElement.style.setProperty('--deep', '#ff1493');
+    } else if (name === 'purple') {
+      document.body.style.background = '#f6e9ff';
+      document.documentElement.style.setProperty('--deep', 'var(--purple)');
+    } else if (name === 'teal') {
+      document.body.style.background = '#e8fffb';
+      document.documentElement.style.setProperty('--deep', 'var(--teal)');
+    } else { // rainbow
+      document.body.style.background = 'linear-gradient(90deg,#ffe4f2,#fff0f5,#e8f8ff,#fff3e6)';
+      document.documentElement.style.setProperty('--deep', '#ff1493');
+    }
+  }
+  function varOr(v) {
+    return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  }
+
+  /* ---------- Compliment initial ---------- */
+  document.getElementById('complimentBox').innerText = compliments[Math.floor(Math.random()*compliments.length)];
+
+  /* ---------- School button ---------- */
+  document.getElementById('schoolBtn').addEventListener('click', () => {
+    window.location.href = 'school.html';
+  });
+
+  /* ---------- Download Profile (board) ---------- */
+  document.getElementById('downloadProfile').addEventListener('click', () => {
+    const data = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = data;
+    a.download = 'whiteboard.png';
+    a.click();
+  });
+
+  console.log('Profile page ready with 2D pet animation and full features.');
 </script>
 </body>
 </html>

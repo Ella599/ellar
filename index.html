@@ -1,248 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ella Fehlauer - Profile</title>
+  <meta charset="UTF-8">
+  <title>Ella Fehlauer - Personal Profile</title>
   <style>
     body, html {
-      margin: 0; padding: 0; height: 100%; width: 100%;
-      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
+      height: 100%;
+      font-family: Arial, sans-serif;
     }
-    /* Whiteboard */
-    #whiteboard {
+
+    canvas#whiteboard {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
-      background: white;
     }
-    /* Card styling */
+
     .card {
       position: absolute;
-      background: rgba(255,182,193,0.9);
+      background: pink;
+      border-radius: 10px;
       padding: 15px;
-      border-radius: 12px;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+      width: 250px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1;
       cursor: move;
-      z-index: 2;
-      width: 220px;
     }
+
     .profile img {
-      width: 100px; height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      display: block;
-      margin: auto;
+      width: 100%;
+      border-radius: 10px;
     }
-    button {
+
+    .controls {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 192, 203, 0.9);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 2;
+    }
+
+    button, input[type="file"] {
       margin-top: 5px;
       padding: 5px 10px;
       border: none;
-      border-radius: 6px;
-      background: #ff69b4;
-      color: white;
+      border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background: #ff85c1;
-    }
-    audio {
-      width: 100%;
-    }
-    /* Whiteboard controls */
-    .controls {
-      position: fixed;
-      bottom: 10px; left: 10px;
-      z-index: 3;
+
+    button {
+      background: white;
     }
   </style>
 </head>
 <body>
   <canvas id="whiteboard"></canvas>
 
-  <!-- Cards -->
+  <!-- Profile Card -->
   <div class="card profile" style="top: 10px; left: 10px;">
-    <img src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
+    <img id="profilePic" src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
     <h2>Ella Fehlauer</h2>
+    <input type="file" id="uploadPic" accept="image/*">
   </div>
 
+  <!-- Countdown Card -->
   <div class="card" style="top: 10px; right: 10px;">
-    <h3>🎄 Christmas!</h3>
-    <p id="christmas"></p>
-    <h3>☀️ Summer Vacation!</h3>
-    <p id="summer"></p>
+    <h3>Christmas!</h3>
+    <p id="christmasCountdown"></p>
+    <h3>Summer Vacation!</h3>
+    <p id="summerCountdown"></p>
   </div>
 
+  <!-- Inspiration Card -->
   <div class="card" style="bottom: 200px; left: 10px;">
-    <h3>🌟 Inspiration</h3>
-    <p id="quoteText">Loading...</p>
+    <h3>Inspirational Quote</h3>
+    <p id="quote">Loading...</p>
     <button onclick="newQuote()">New Quote</button>
   </div>
 
-  <div class="card" style="bottom: 90px; left: 10px;">
-    <h3>💖 Daily Affirmation</h3>
-    <p id="affirmationText">Loading...</p>
+  <!-- Affirmation Card -->
+  <div class="card" style="bottom: 100px; left: 10px;">
+    <h3>Daily Affirmation</h3>
+    <p id="affirmation">Loading...</p>
     <button onclick="newAffirmation()">New Affirmation</button>
   </div>
 
+  <!-- Music Player Card -->
   <div class="card" style="bottom: 200px; right: 10px;">
-    <h3>🎵 Music Player</h3>
+    <h3>Music Player</h3>
     <audio controls>
       <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+      Your browser does not support audio.
     </audio>
   </div>
 
-  <div class="card" style="bottom: 90px; right: 10px;">
-    <h3>📚 School Tools</h3>
-    <button onclick="location.href='school.html'">Go to School Page</button>
+  <!-- School Tools Card -->
+  <div class="card" style="bottom: 100px; right: 10px;">
+    <h3>School Tools</h3>
+    <button onclick="window.location.href='school.html'">Go to School Page</button>
   </div>
 
-  <!-- Whiteboard controls -->
+  <!-- Whiteboard Controls -->
   <div class="controls">
     <button onclick="clearBoard()">Clear</button>
-    <button onclick="toggleLock()" id="lockBtn">Lock</button>
+    <button onclick="toggleLock()">Lock/Unlock</button>
     <input type="color" id="colorPicker" value="#000000">
   </div>
 
   <script>
-    /* -------- WHITEBOARD -------- */
+    // ========== WHITEBOARD ==========
     const canvas = document.getElementById('whiteboard');
     const ctx = canvas.getContext('2d');
     let drawing = false;
     let locked = false;
-    let color = "#000000";
 
-    function resizeCanvas(){
+    function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    canvas.addEventListener('mousedown', e => { if(!locked){drawing = true; draw(e);} });
-    canvas.addEventListener('mouseup', () => {drawing = false; ctx.beginPath();});
-    canvas.addEventListener('mouseout', () => {drawing = false; ctx.beginPath();});
-    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mousedown', () => { if (!locked) drawing = true; });
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseout', () => drawing = false);
 
-    function draw(e){
-      if(!drawing) return;
+    canvas.addEventListener('mousemove', (e) => {
+      if (!drawing) return;
       ctx.lineWidth = 3;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = color;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = document.getElementById('colorPicker').value;
       ctx.lineTo(e.clientX, e.clientY);
       ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(e.clientX, e.clientY);
+    });
+
+    function clearBoard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
-    function clearBoard(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
-    function toggleLock(){
+    function toggleLock() {
       locked = !locked;
-      document.getElementById("lockBtn").textContent = locked ? "Unlock" : "Lock";
     }
-    document.getElementById("colorPicker").addEventListener("input", e => color = e.target.value);
 
-    /* -------- COUNTDOWNS -------- */
-    function updateCountdowns(){
-      const now = new Date();
-      const christmas = new Date("Dec 25, 2025 00:00:00");
-      updateCountdown("christmas", christmas, now);
-      const summer = new Date("May 29, 2026 00:00:00");
-      updateCountdown("summer", summer, now);
-    }
-    function updateCountdown(id, date, now){
-      let diff = date - now;
-      if (diff < 0) { document.getElementById(id).innerText = "Passed!"; return; }
-      const sec = Math.floor(diff/1000)%60;
-      const min = Math.floor(diff/1000/60)%60;
-      const hr = Math.floor(diff/1000/60/60)%24;
-      const days = Math.floor(diff/1000/60/60/24)%30;
-      const months = Math.floor(diff/1000/60/60/24/30)%12;
-      const years = Math.floor(diff/1000/60/60/24/365);
-      document.getElementById(id).innerText = 
-        `${years}y ${months}m ${days}d ${hr}h ${min}m ${sec}s`;
-    }
-    setInterval(updateCountdowns,1000);
-    updateCountdowns();
+    // ========== DRAGGABLE CARDS ==========
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousedown', function(e) {
+        let shiftX = e.clientX - card.getBoundingClientRect().left;
+        let shiftY = e.clientY - card.getBoundingClientRect().top;
 
-    /* -------- QUOTES -------- */
+        function moveAt(pageX, pageY) {
+          card.style.left = pageX - shiftX + 'px';
+          card.style.top = pageY - shiftY + 'px';
+          card.style.right = 'auto';
+          card.style.bottom = 'auto';
+        }
+
+        function onMouseMove(e) {
+          moveAt(e.pageX, e.pageY);
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+
+        card.onmouseup = function() {
+          document.removeEventListener('mousemove', onMouseMove);
+          card.onmouseup = null;
+        };
+      });
+
+      card.ondragstart = () => false;
+    });
+
+    // ========== COUNTDOWNS ==========
+    function updateCountdowns() {
+      const christmas = new Date("Dec 25, 2025 00:00:00").getTime();
+      const summer = new Date("May 29, 2026 00:00:00").getTime();
+      const now = new Date().getTime();
+
+      function formatCountdown(target) {
+        let distance = target - now;
+        if (distance < 0) return "Expired!";
+        let years = Math.floor(distance / (1000*60*60*24*365));
+        let months = Math.floor(distance / (1000*60*60*24*30));
+        let days = Math.floor(distance / (1000*60*60*24));
+        let hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60));
+        let minutes = Math.floor((distance % (1000*60*60)) / (1000*60));
+        let seconds = Math.floor((distance % (1000*60)) / 1000);
+        return `${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+
+      document.getElementById("christmasCountdown").innerText = formatCountdown(christmas);
+      document.getElementById("summerCountdown").innerText = formatCountdown(summer);
+    }
+    setInterval(updateCountdowns, 1000);
+
+    // ========== QUOTES & AFFIRMATIONS ==========
     const quotes = [
       "Believe you can and you're halfway there.",
-      "Start each day with a positive thought.",
-      "Your potential is endless.",
-      "Dream big, work hard, stay focused.",
-      "You are capable of amazing things.",
-      "Every day is a fresh start.",
-      "Progress, not perfection."
+      "Keep pushing forward!",
+      "Your only limit is your mind.",
+      "Dream it. Wish it. Do it."
     ];
-    function newQuote(){
-      const q = quotes[Math.floor(Math.random()*quotes.length)];
-      document.getElementById("quoteText").textContent = q;
-      localStorage.setItem("dailyQuote", q);
-      localStorage.setItem("quoteDate", new Date().toDateString());
-    }
-    function loadDailyQuote(){
-      const saved = localStorage.getItem("dailyQuote");
-      const date = localStorage.getItem("quoteDate");
-      const today = new Date().toDateString();
-      if(saved && date === today){
-        document.getElementById("quoteText").textContent = saved;
-      } else {
-        newQuote();
-      }
-    }
-    loadDailyQuote();
-
-    /* -------- AFFIRMATIONS -------- */
     const affirmations = [
-      "I am strong and capable.",
+      "I am capable of amazing things.",
       "I learn and grow every day.",
       "I believe in myself.",
-      "I choose positivity.",
-      "I can achieve my goals.",
-      "I am proud of my progress.",
-      "I am enough."
+      "I am strong and confident."
     ];
-    function newAffirmation(){
-      const a = affirmations[Math.floor(Math.random()*affirmations.length)];
-      document.getElementById("affirmationText").textContent = a;
-      localStorage.setItem("dailyAffirmation", a);
-      localStorage.setItem("affirmDate", new Date().toDateString());
-    }
-    function loadDailyAffirmation(){
-      const saved = localStorage.getItem("dailyAffirmation");
-      const date = localStorage.getItem("affirmDate");
-      const today = new Date().toDateString();
-      if(saved && date === today){
-        document.getElementById("affirmationText").textContent = saved;
-      } else {
-        newAffirmation();
-      }
-    }
-    loadDailyAffirmation();
 
-    /* -------- DRAGGABLE CARDS -------- */
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-      let offsetX, offsetY, dragging = false;
-      card.addEventListener('mousedown', e => {
-        dragging = true;
-        offsetX = e.clientX - card.offsetLeft;
-        offsetY = e.clientY - card.offsetTop;
-        card.style.zIndex = 10;
-      });
-      document.addEventListener('mousemove', e => {
-        if(dragging){
-          card.style.left = (e.clientX - offsetX) + "px";
-          card.style.top = (e.clientY - offsetY) + "px";
-        }
-      });
-      document.addEventListener('mouseup', () => {
-        dragging = false;
-        card.style.zIndex = 2;
-      });
+    function newQuote() {
+      document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+    }
+    function newAffirmation() {
+      document.getElementById("affirmation").innerText = affirmations[Math.floor(Math.random() * affirmations.length)];
+    }
+    newQuote();
+    newAffirmation();
+
+    // ========== PROFILE PIC UPLOAD ==========
+    document.getElementById("uploadPic").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById("profilePic").src = e.target.result;
+          localStorage.setItem("profileImage", e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.addEventListener("load", () => {
+      const savedPic = localStorage.getItem("profileImage");
+      if (savedPic) {
+        document.getElementById("profilePic").src = savedPic;
+      }
     });
   </script>
 </body>

@@ -1,333 +1,479 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Ella's Profile</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: pink;
-      color: #333;
-      overflow-x: hidden;
-      transition: background 0.5s;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      background: #ff99cc;
-    }
-
-    #profilePic {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin-right: 15px;
-      border: 3px solid white;
-      object-fit: cover;
-    }
-
-    #name {
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-      flex-grow: 1;
-    }
-
-    #controls {
-      position: absolute;
-      top: 15px;
-      left: 120px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 5px 10px;
-      border-radius: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      z-index: 10;
-    }
-
-    #board {
-      display: block;
-      width: 100%;
-      height: calc(100vh - 250px);
-      border-top: 2px solid white;
-      cursor: crosshair;
-    }
-
-    .countdowns {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: #ffe6f2;
-    }
-
-    .countdown {
-      font-size: 18px;
-      font-weight: bold;
-      color: #cc0066;
-    }
-
-    #pet {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      width: 200px;
-      height: 200px;
-      background: #fff0f5;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background: #ffccdd;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    button {
-      background: #ff66aa;
-      border: none;
-      padding: 8px 12px;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #ff3385;
-    }
-
-    #inspiration {
-      text-align: center;
-      padding: 10px;
-      font-style: italic;
-      background: #fff0f5;
-      color: #660033;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ella Fehlauer — Profile</title>
+<!-- Three.js for 3D pet -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<style>
+  :root{
+    --pink:#ff69b4; --deep:#ff1493; --light:#ffe4f2;
+    --purple:#a020f0; --teal:#20c5b6;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,Arial;background:var(--light);color:var(--deep);}
+  header{
+    display:flex;align-items:center;gap:12px;padding:12px 16px;
+    background:linear-gradient(90deg,#ffd6e8,#fff0f5);box-shadow:0 2px 6px rgba(0,0,0,0.06);position:relative;z-index:50;
+  }
+  #profilePic{width:92px;height:92px;border-radius:50%;object-fit:cover;border:3px solid var(--deep)}
+  #name{font-size:20px;font-weight:700;color:var(--deep)}
+  #top-controls{margin-left:auto;display:flex;gap:8px;align-items:center}
+  #top-controls input[type=file]{display:inline-block}
+  button,input,select{font-family:inherit}
+  button{background:var(--deep);color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  button.secondary{background:white;color:var(--deep);border:2px solid var(--deep)}
+  .subheader{display:flex;justify-content:space-between;padding:10px 16px;background:#fff0f7;border-bottom:1px solid rgba(0,0,0,0.03)}
+  .countdownBox{display:flex;gap:10px;align-items:center}
+  .count{background:rgba(255,255,255,0.9);padding:8px;border-radius:8px;border:2px solid rgba(255,20,147,0.08);min-width:240px}
+  /* whiteboard area */
+  #whiteboard-wrap{position:relative;height:62vh;background:#fff0f5;overflow:hidden}
+  #board{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+  /* toolbar bottom-left */
+  #wb-controls{position:absolute;left:12px;bottom:12px;z-index:40;background:rgba(255,255,255,0.95);padding:8px;border-radius:10px;border:2px solid rgba(255,20,147,0.12);display:flex;gap:8px;align-items:center}
+  #wb-controls label{font-size:13px;color:var(--deep)}
+  /* sparkles and hearts */
+  .sparkle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:1000;mix-blend-mode:screen;opacity:0.9}
+  .heart{position:fixed;font-size:20px;pointer-events:none;z-index:900;opacity:0.9}
+  /* right column panels */
+  .right-panel{position:absolute;right:16px;top:18vh;z-index:30;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+  .panel{background:rgba(255,255,255,0.95);padding:10px;border-radius:10px;border:2px solid rgba(255,20,147,0.08);min-width:220px}
+  /* pet container */
+  #petWrap{width:260px;height:220px;display:block}
+  /* inspiration */
+  #inspiration{padding:10px;text-align:center;font-style:italic;color:#9f145d}
+  /* sticky notes mini */
+  .note{position:absolute;background:#fff3fb;border:2px solid #ffb6d6;padding:8px;border-radius:8px;cursor:move;min-width:120px;box-shadow:2px 2px 6px rgba(0,0,0,0.12)}
+  /* footer */
+  footer{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#ffccdd;gap:8px;flex-wrap:wrap}
+  audio{height:40px}
+  @media(max-width:900px){
+    .right-panel{display:none}
+    #wb-controls{left:8px;bottom:8px}
+  }
+</style>
 </head>
 <body>
   <header>
-    <img id="profilePic" src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
-    <div id="name">Ella Fehlauer</div>
-    <input type="file" id="picUpload" accept="image/*">
-    <button id="avatarBtn">Use Avatar</button>
+    <img id="profilePic" src="Screenshot 2025-09-25 082821.png" alt="Profile">
+    <div>
+      <div id="name">Ella Fehlauer</div>
+      <div style="font-size:12px;color:#a31860">Personal profile — make it yours!</div>
+    </div>
+
+    <div id="top-controls">
+      <input id="picUpload" type="file" accept="image/*" title="Upload profile picture">
+      <button id="avatarBtn" class="secondary" title="Use a cute avatar">Use Avatar</button>
+      <select id="themeSelect" title="Site theme">
+        <option value="pink">Pink</option>
+        <option value="purple">Purple</option>
+        <option value="teal">Teal</option>
+        <option value="rainbow">Rainbow</option>
+      </select>
+      <button id="schoolBtn">📚 School Tools</button>
+    </div>
   </header>
 
-  <div class="countdowns">
-    <div class="countdown" id="summer"></div>
-    <div class="countdown" id="christmas"></div>
+  <div class="subheader">
+    <div id="inspiration">
+      <div id="quote">—</div>
+      <div style="margin-top:6px"><button id="affirmBtn">Daily Affirmation</button> <span id="affirmation" style="margin-left:8px;font-weight:600;"></span></div>
+    </div>
+    <div class="countdownBox" style="gap:12px">
+      <div class="count"><strong>☀️ Summer Vacation!</strong><div id="summerTimer">—</div></div>
+      <div class="count"><strong>🎄 Christmas!</strong><div id="christmasTimer">—</div></div>
+    </div>
   </div>
 
-  <!-- Inspiration -->
-  <div id="inspiration">
-    <div id="quote"></div>
-    <button onclick="showAffirmation()">💖 Daily Affirmation</button>
-    <div id="affirmation"></div>
-  </div>
+  <!-- whiteboard -->
+  <div id="whiteboard-wrap">
+    <canvas id="board"></canvas>
 
-  <!-- Whiteboard Controls -->
-  <div id="controls">
-    <label>Color:</label>
-    <input type="color" id="colorPicker" value="#ff4d94">
-    <button onclick="clearBoard()">Clear</button>
-  </div>
+    <!-- whiteboard controls bottom-left (out of the way) -->
+    <div id="wb-controls">
+      <label for="colorPicker">Color</label>
+      <input id="colorPicker" type="color" value="#ff4d94">
+      <label for="brushSize">Size</label>
+      <input id="brushSize" type="range" min="1" max="40" value="6" style="width:90px">
+      <button id="eraserBtn" class="secondary">Eraser</button>
+      <button id="clearBtn">Clear</button>
+      <button id="downloadBtn" class="secondary">Save PNG</button>
+      <button id="stickerBtn">Add Sticker</button>
+    </div>
 
-  <canvas id="board"></canvas>
+    <!-- right side panels: pet + sticky note quick add -->
+    <div class="right-panel">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong>Pet (dog)</strong></div>
+          <div style="font-size:12px;color:#a31860">Click pet to play</div>
+        </div>
+        <div id="petWrap"></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <input id="petUpload" type="file" accept=".glb,.gltf" title="Replace pet model (optional)" />
+          <button id="feedBtn">🍖 Feed</button>
+          <button id="resetPet" class="secondary">Reset</button>
+        </div>
+      </div>
 
-  <!-- 3D Pet -->
-  <div id="pet"></div>
-  <div style="position:absolute; bottom:230px; right:30px;">
-    <button onclick="feedPet()">🍖 Feed Dog</button>
+      <div class="panel">
+        <strong>Sticky Notes</strong>
+        <div style="margin-top:8px">
+          <button id="addNoteBtn">➕ Add Note</button>
+          <button id="clearNotesBtn" class="secondary">Clear Notes</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer>
-    <button onclick="toggleTheme()">🎨 Change Theme</button>
-    <audio id="musicPlayer" controls>
-      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-    <button onclick="location.href='school.html'">📚 Go to School Page</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="themeToggle">Change Theme</button>
+      <button id="showCompliment" class="secondary">Random Compliment</button>
+      <div id="complimentBox" style="font-weight:600;color:#92204b;margin-left:8px"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <audio id="bgAudio" controls>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Your browser doesn't support audio
+      </audio>
+      <button id="downloadProfile" class="secondary">Download Profile (PNG)</button>
+    </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+/* ------------------- Profile pic upload & avatar ------------------- */
+const profilePic = document.getElementById('profilePic');
+const picUpload = document.getElementById('picUpload');
+const avatarBtn = document.getElementById('avatarBtn');
+const savedPic = localStorage.getItem('profilePic');
+if(savedPic) profilePic.src = savedPic;
+picUpload.addEventListener('change', () => {
+  const f = picUpload.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => { profilePic.src = e.target.result; localStorage.setItem('profilePic', e.target.result); }
+  r.readAsDataURL(f);
+});
+avatarBtn.addEventListener('click', () => {
+  const url = 'https://i.ibb.co/4Y3mJrh/avatar.png'; // sample avatar (replaceable)
+  profilePic.src = url; localStorage.setItem('profilePic', url);
+});
 
-  <script>
-    /* ---------------- Profile Picture Upload ---------------- */
-    const profilePic = document.getElementById("profilePic");
-    const picUpload = document.getElementById("picUpload");
-    const avatarBtn = document.getElementById("avatarBtn");
+/* ------------------- Quotes & Affirmations ------------------- */
+const quotes = [
+  "Believe in yourself and all that you are.",
+  "Every day is a fresh start — make it count.",
+  "Dream big and dare to begin.",
+  "Small steps every day add up to big change.",
+  "You are stronger than you think."
+];
+document.getElementById('quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+const affirmations = [
+  "You are capable of amazing things.",
+  "Keep shining — the world needs you.",
+  "Today, you will make progress.",
+  "You are creative, kind and courageous.",
+  "Take a deep breath — you've got this."
+];
+document.getElementById('affirmBtn').addEventListener('click', () => {
+  document.getElementById('affirmation').innerText = affirmations[Math.floor(Math.random()*affirmations.length)];
+});
 
-    const savedPic = localStorage.getItem("profilePic");
-    if (savedPic) profilePic.src = savedPic;
+/* ------------------- Compliments ------------------- */
+const compliments = ["You're amazing! 💕","Keep shining! ✨","You can do it! 🌟","Smiles suit you 😊","You're doing great! 💖"];
+document.getElementById('showCompliment').addEventListener('click', () => {
+  document.getElementById('complimentBox').innerText = compliments[Math.floor(Math.random()*compliments.length)];
+});
 
-    picUpload.addEventListener("change", function() {
-      const file = this.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        profilePic.src = e.target.result;
-        localStorage.setItem("profilePic", e.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
+/* ------------------- Whiteboard (continuous strokes) ------------------- */
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+const colorPicker = document.getElementById('colorPicker');
+const brushSize = document.getElementById('brushSize');
+const eraserBtn = document.getElementById('eraserBtn');
+const clearBtn = document.getElementById('clearBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const stickerBtn = document.getElementById('stickerBtn');
 
-    avatarBtn.addEventListener("click", () => {
-      const avatarUrl = "https://i.ibb.co/4Y3mJrh/avatar.png"; // sample avatar
-      profilePic.src = avatarUrl;
-      localStorage.setItem("profilePic", avatarUrl);
-    });
+function resizeCanvas(){ const wrap = document.getElementById('whiteboard-wrap'); canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    /* ---------------- Countdowns ---------------- */
-    function updateCountdown(id, targetDate, label) {
-      const now = new Date();
-      const diff = targetDate - now;
-      if (diff <= 0) {
-        document.getElementById(id).textContent = `${label} is here!`;
-        return;
-      }
-      const seconds = Math.floor(diff / 1000) % 60;
-      const minutes = Math.floor(diff / (1000 * 60)) % 60;
-      const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24)) % 30;
-      const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30)) % 12;
-      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-      document.getElementById(id).textContent =
-        `${label}: ${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
+let drawing=false, erasing=false;
+let lastX=0, lastY=0;
+
+canvas.addEventListener('pointerdown', (e)=>{ drawing=true; const r=canvas.getBoundingClientRect(); lastX = e.clientX - r.left; lastY = e.clientY - r.top; ctx.beginPath(); ctx.moveTo(lastX,lastY); });
+canvas.addEventListener('pointerup', ()=>{ drawing=false; ctx.beginPath(); });
+canvas.addEventListener('pointerleave', ()=>{ drawing=false; ctx.beginPath(); });
+canvas.addEventListener('pointermove', (e)=> {
+  if(!drawing) return;
+  const r=canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  if(erasing){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = brushSize.value;
+    ctx.lineCap = 'round';
+    ctx.lineTo(x,y);
+    ctx.stroke();
+  } else {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = colorPicker.value;
+    ctx.lineWidth = brushSize.value;
+    ctx.lineCap = 'round';
+    ctx.lineTo(x,y);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+});
+
+eraserBtn.addEventListener('click', ()=>{ erasing = !erasing; eraserBtn.textContent = erasing ? 'Eraser ✓' : 'Eraser'; });
+clearBtn.addEventListener('click', ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); });
+downloadBtn.addEventListener('click', ()=> {
+  const data = canvas.toDataURL('image/png'); const a = document.createElement('a'); a.href = data; a.download = 'doodle.png'; a.click();
+});
+
+/* sticker: place a small heart sticker at a random place on canvas */
+stickerBtn.addEventListener('click', ()=> {
+  const r = canvas.getBoundingClientRect();
+  const x = Math.random()*(r.width-40)+20;
+  const y = Math.random()*(r.height-40)+20;
+  ctx.save();
+  ctx.font = '40px serif';
+  ctx.fillText('💖', x, y);
+  ctx.restore();
+});
+
+/* ------------------- Sparkle cursor (small visual) ------------------- */
+document.addEventListener('mousemove', e => {
+  const el = document.createElement('div'); el.className='sparkle';
+  el.style.left = (e.pageX-3)+'px'; el.style.top = (e.pageY-3)+'px';
+  el.style.background = colorPicker.value;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),700);
+});
+
+/* ------------------- Floating hearts (decor) ------------------- */
+setInterval(()=> {
+  const h = document.createElement('div'); h.className='heart'; h.innerText='💖';
+  h.style.left = Math.random()*(window.innerWidth-40)+'px'; h.style.top = (window.innerHeight+10)+'px';
+  h.style.transition = 'transform 5s linear, opacity 5s linear';
+  document.body.appendChild(h);
+  requestAnimationFrame(()=> { h.style.transform = `translateY(-${window.innerHeight+100}px)`; h.style.opacity='0'; });
+  setTimeout(()=>h.remove(),5200);
+}, 3000);
+
+/* ------------------- Countdown timers (exact dates) ------------------- */
+function getNext(target){ // returns Date of target (if target is past for the year, adjust)
+  return new Date(target);
+}
+function formatDiff(target, includeYears=false){
+  const now = new Date(); let diff = target - now; if(diff<=0) return "It's here!";
+  const years = includeYears ? Math.floor(diff/(1000*60*60*24*365.25)) : 0;
+  const months = Math.floor((diff/(1000*60*60*24*30.44))%12);
+  const days = Math.floor((diff/(1000*60*60*24))%30.44);
+  const hours = Math.floor((diff/(1000*60*60))%24);
+  const minutes = Math.floor((diff/(1000*60))%60);
+  const seconds = Math.floor((diff/1000)%60);
+  return (includeYears? years + 'y, ' : '') + `${months}mo ${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+function updateTimers(){
+  const christmas = getNext(new Date('2025-12-25T00:00:00'));
+  const summer   = getNext(new Date('2026-05-29T00:00:00'));
+  document.getElementById('christmasTimer').innerText = formatDiff(christmas,false);
+  document.getElementById('summerTimer').innerText = formatDiff(summer,true);
+}
+setInterval(updateTimers,1000); updateTimers();
+
+/* ------------------- 3D Dog (procedural primitives) ------------------- */
+const petWrap = document.getElementById('petWrap');
+let scene, cam, renderer, petGroup, clock;
+initPet(); animatePet();
+
+function initPet(){
+  // three scene
+  scene = new THREE.Scene();
+  cam = new THREE.PerspectiveCamera(45, petWrap.clientWidth/petWrap.clientHeight, 0.1, 1000);
+  cam.position.set(0,1.2,3);
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setSize(petWrap.clientWidth, petWrap.clientHeight);
+  petWrap.innerHTML=''; petWrap.appendChild(renderer.domElement);
+  const ambient = new THREE.AmbientLight(0xffffff,0.8); scene.add(ambient);
+  const dir = new THREE.DirectionalLight(0xffffff,0.6); dir.position.set(5,10,7); scene.add(dir);
+
+  petGroup = new THREE.Group(); scene.add(petGroup);
+
+  // materials
+  const bodyMat = new THREE.MeshStandardMaterial({color:0xffc9a8, roughness:0.7});
+  const darkMat = new THREE.MeshStandardMaterial({color:0x8b5a3c});
+  const eyeMat = new THREE.MeshStandardMaterial({color:0x0b0b0b});
+
+  // body
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.6,32,20), bodyMat);
+  body.scale.set(1.6,1.0,1.0); body.position.set(0,0.5,0); petGroup.add(body);
+
+  // head
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.36,24,20), bodyMat); head.position.set(0.95,0.95,0); petGroup.add(head);
+  const snout = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.45,12), bodyMat); snout.rotation.z = Math.PI/2; snout.position.set(1.26,0.94,0); petGroup.add(snout);
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.07,12,8), darkMat); nose.position.set(1.48,0.94,0); petGroup.add(nose);
+  // ears
+  const earL = new THREE.Mesh(new THREE.ConeGeometry(0.12,0.28,10), darkMat); earL.position.set(0.95,1.28,0.14); earL.rotation.z = 0.45; petGroup.add(earL);
+  const earR = earL.clone(); earR.position.set(0.95,1.28,-0.14); earR.rotation.z = -0.45; petGroup.add(earR);
+  // legs
+  for(let i=-1;i<=1;i+=2){
+    for(let j=0;j<2;j++){
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.6,10), bodyMat);
+      leg.position.set(i*0.5,0.15,(j-0.5)*0.35); petGroup.add(leg);
     }
-    setInterval(() => {
-      updateCountdown("christmas", new Date("2025-12-25"), "🎄 Christmas");
-      updateCountdown("summer", new Date("2026-05-29"), "☀️ Summer Vacation");
-    }, 1000);
+  }
+  // tail
+  const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.6,8), darkMat);
+  tail.position.set(-1.05,0.75,0); tail.rotation.z = Math.PI/3; petGroup.add(tail);
+  // eyes
+  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8), eyeMat); eyeL.position.set(1.02,1.02,0.12); petGroup.add(eyeL);
+  const eyeR = eyeL.clone(); eyeR.position.set(1.02,1.02,-0.12); petGroup.add(eyeR);
 
-    /* ---------------- Whiteboard ---------------- */
-    const canvas = document.getElementById("board");
-    const ctx = canvas.getContext("2d");
-    const colorPicker = document.getElementById("colorPicker");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 250;
+  petGroup.rotation.y = -0.6;
+  clock = new THREE.Clock();
+  window.addEventListener('resize', ()=>{ renderer.setSize(petWrap.clientWidth, petWrap.clientHeight); cam.aspect = petWrap.clientWidth / petWrap.clientHeight; cam.updateProjectionMatrix(); });
+}
 
-    let drawing = false;
+let feedInProgress=false;
+function petJump(){ // small jump + wag
+  if(!petGroup) return;
+  feedInProgress = true;
+  const start = performance.now();
+  const dur = 700;
+  (function anim(){
+    const t = performance.now()-start;
+    const p = Math.min(1,t/dur);
+    petGroup.position.y = Math.sin(Math.PI * p) * 0.6;
+    petGroup.rotation.y += 0.12 * Math.sin(p*Math.PI*4); // wiggle
+    if(p<1) requestAnimationFrame(anim); else { petGroup.position.y=0; feedInProgress=false; }
+  })();
+}
 
-    canvas.addEventListener("mousedown", (e) => {
-      drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(e.offsetX, e.offsetY);
-    });
-    canvas.addEventListener("mouseup", () => { drawing = false; ctx.beginPath(); });
-    canvas.addEventListener("mousemove", draw);
+function animatePet(){
+  requestAnimationFrame(animatePet);
+  const t = clock.getElapsedTime();
+  petGroup.rotation.y += 0.003;
+  if(!feedInProgress) petGroup.position.y = 0.04 * Math.sin(t*2);
+  renderer.render(scene,cam);
+}
 
-    function draw(e) {
-      if (!drawing) return;
-      ctx.strokeStyle = colorPicker.value;
-      ctx.lineWidth = 4;
-      ctx.lineCap = "round";
-      ctx.lineTo(e.offsetX, e.offsetY);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(e.offsetX, e.offsetY);
+/* clicking the pet area also animates */
+petWrap.addEventListener('click', ()=> petJump());
+
+/* feed button: show falling treat and animate pet */
+document.getElementById('feedBtn').addEventListener('click', ()=> {
+  // visual treat drop (emoji)
+  const treat = document.createElement('div'); treat.innerText='🍖';
+  treat.style.position='fixed'; treat.style.right='80px'; treat.style.bottom='240px'; treat.style.fontSize='28px'; treat.style.zIndex='9999';
+  document.body.appendChild(treat);
+  // animate falling toward pet
+  const targetRect = petWrap.getBoundingClientRect();
+  const tx = targetRect.left + targetRect.width/2;
+  const ty = targetRect.top + targetRect.height/2;
+  let start = null;
+  const startX = window.innerWidth - 80, startY = window.innerHeight - 60;
+  function fall(ts){
+    if(!start) start=ts;
+    const p = Math.min(1,(ts-start)/700);
+    treat.style.right = (window.innerWidth - (startX + (tx-startX)*p)) + 'px';
+    treat.style.bottom = (window.innerHeight - (startY + (ty-startY)*p)) + 'px';
+    treat.style.transform = `scale(${1 - 0.3*p})`;
+    if(p<1) requestAnimationFrame(fall); else {
+      setTimeout(()=>{ treat.remove(); petJump(); }, 80);
     }
-    function clearBoard() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  requestAnimationFrame(fall);
+});
+
+/* pet reset (rebuild) */
+document.getElementById('resetPet').addEventListener('click', ()=> { if(scene && petGroup){ scene.remove(petGroup); initPet(); } });
+
+/* NOTE: petUpload is accepted but loading a local .glb would require GLTFLoader + file->arraybuffer parsing. That is prepared as a future enhancement. */
+
+/* ------------------- Sticky notes board (saved & draggable) ------------------- */
+const addNoteBtn = document.getElementById('addNoteBtn');
+const noteBoard = document.getElementById('whiteboard-wrap');
+const clearNotesBtn = document.getElementById('clearNotesBtn');
+
+function saveNotes(){
+  const arr = [];
+  document.querySelectorAll('.note').forEach(n => {
+    arr.push({text: n.querySelector('textarea').value, left: n.style.left, top: n.style.top});
+  });
+  localStorage.setItem('notesBoard', JSON.stringify(arr));
+}
+function loadNotes(){
+  const arr = JSON.parse(localStorage.getItem('notesBoard') || '[]');
+  arr.forEach(n => createNote(n.text, n.left, n.top));
+}
+function createNote(text='Note', left='40px', top='40px'){
+  const n = document.createElement('div'); n.className='note';
+  n.style.left = left; n.style.top = top;
+  n.innerHTML = `<button style="float:right" onclick="this.parentElement.remove(); saveNotes()">✖</button>
+                 <textarea style="width:100%;height:80px;border:none;background:transparent">${text}</textarea>`;
+  noteBoard.appendChild(n);
+  const ta = n.querySelector('textarea');
+  ta.addEventListener('input', saveNotes);
+
+  // drag
+  n.onmousedown = e => {
+    const rect = noteBoard.getBoundingClientRect();
+    let shiftX = e.clientX - n.getBoundingClientRect().left;
+    let shiftY = e.clientY - n.getBoundingClientRect().top;
+    function moveAt(pageX,pageY){
+      n.style.left = Math.max(0, Math.min(rect.width - n.offsetWidth, pageX - rect.left - shiftX)) + 'px';
+      n.style.top  = Math.max(0, Math.min(rect.height - n.offsetHeight, pageY - rect.top - shiftY)) + 'px';
     }
+    function onMouseMove(e){ moveAt(e.pageX,e.pageY); }
+    document.addEventListener('mousemove', onMouseMove);
+    n.onmouseup = ()=> { document.removeEventListener('mousemove', onMouseMove); n.onmouseup=null; saveNotes(); };
+  };
+  n.ondragstart = ()=> false;
+}
 
-    /* ---------------- Inspiration ---------------- */
-    const quotes = [
-      "Believe in yourself and all that you are.",
-      "Every day is a fresh start.",
-      "Dream big and dare to fail.",
-      "You are stronger than you think.",
-      "Do something today that your future self will thank you for."
-    ];
-    document.getElementById("quote").textContent =
-      quotes[Math.floor(Math.random() * quotes.length)];
+addNoteBtn.addEventListener('click', ()=> { createNote('', '20px', '20px'); saveNotes(); });
+clearNotesBtn.addEventListener('click', ()=> { document.querySelectorAll('.note').forEach(x=>x.remove()); saveNotes(); });
+loadNotes();
 
-    const affirmations = [
-      "You are capable of amazing things.",
-      "You light up the world with your smile.",
-      "You can handle anything that comes your way.",
-      "Keep going — you’re doing great!",
-      "You are loved, valued, and enough."
-    ];
-    function showAffirmation() {
-      document.getElementById("affirmation").textContent =
-        affirmations[Math.floor(Math.random() * affirmations.length)];
-    }
+/* ------------------- Theme select & toggle ------------------- */
+const themeSelect = document.getElementById('themeSelect');
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('siteTheme') || 'pink';
+themeSelect.value = savedTheme; applyTheme(savedTheme);
+themeSelect.addEventListener('change', ()=> { applyTheme(themeSelect.value); localStorage.setItem('siteTheme', themeSelect.value); });
+themeToggle.addEventListener('click', ()=> {
+  const opts = ['pink','purple','teal','rainbow'];
+  const idx = (opts.indexOf(themeSelect.value) + 1) % opts.length;
+  themeSelect.value = opts[idx];
+  applyTheme(opts[idx]);
+  localStorage.setItem('siteTheme', opts[idx]);
+});
+function applyTheme(name){
+  document.body.style.background = (name==='pink'? 'var(--light)' : name==='purple'? '#f6e9ff' : name==='teal'? '#e8fffb' : 'linear-gradient(90deg,#ffe4f2,#fff0f5,#e8f8ff,#fff3e6)');
+  document.documentElement.style.setProperty('--deep', name==='purple'? 'var(--purple)' : name==='teal'? 'var(--teal)' : 'var(--deep)');
+}
 
-    /* ---------------- 3D Dog Pet ---------------- */
-    const petContainer = document.getElementById("pet");
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      50, petContainer.clientWidth / petContainer.clientHeight, 0.1, 1000
-    );
-    const renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setSize(petContainer.clientWidth, petContainer.clientHeight);
-    petContainer.appendChild(renderer.domElement);
+/* ------------------- Compliment helper displayed earlier ------------------- */
+/* set compliment box initially empty */
 
-    const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-    scene.add(light);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(3, 10, 5);
-    scene.add(dirLight);
+/* ------------------- School page button (link) ------------------- */
+document.getElementById('schoolBtn').addEventListener('click', ()=> location.href='school.html');
 
-    let dog;
-    const loader = new THREE.GLTFLoader();
-    loader.load(
-      "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb", 
-      function(gltf) {
-        dog = gltf.scene;
-        dog.scale.set(0.02, 0.02, 0.02);
-        dog.position.y = -1;
-        scene.add(dog);
-        camera.position.z = 5;
-      },
-      undefined,
-      function(error) { console.error("Error loading model:", error); }
-    );
+/* ------------------- Download profile snapshot (basic) ------------------- */
+document.getElementById('downloadProfile').addEventListener('click', ()=> {
+  // simple: download whiteboard as PNG + profile pic not combined; for full page snapshot you'd need html2canvas
+  const data = canvas.toDataURL('image/png'); const a = document.createElement('a'); a.href=data; a.download='whiteboard.png'; a.click();
+});
 
-    function animate() {
-      requestAnimationFrame(animate);
-      if (dog) dog.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-    animate();
+/* ------------------- Initialize a few things ------------------- */
+document.getElementById('complimentBox').innerText = compliments[Math.floor(Math.random()*compliments.length)];
+// pet initial: done in initPet/animatePet already
 
-    petContainer.addEventListener("click", () => {
-      if (dog) {
-        dog.position.y = -0.5;
-        setTimeout(() => dog.position.y = -1, 300);
-      }
-    });
-
-    /* ---------------- Pet Interactions ---------------- */
-    function feedPet() {
-      const treat = document.createElement("div");
-      treat.textContent = "🍖";
-      treat.style.position = "absolute";
-      treat.style.fontSize = "24px";
-      treat.style.bottom = "220px";
-      treat.style.right = "60px";
-      document.body.appendChild(treat);
-      setTimeout(() => treat.remove(), 2000);
-    }
-
-    /* ---------------- Theme Toggle ---------------- */
-    const themes = ["pink", "plum", "teal", "linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)"];
-    let currentTheme = 0;
-    function toggleTheme() {
-      currentTheme = (currentTheme + 1) % themes.length;
-      document.body.style.background = themes[currentTheme];
-    }
-  </script>
+// small visual readiness
+console.log('Profile page loaded with full features.');
+</script>
 </body>
 </html>

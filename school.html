@@ -28,6 +28,7 @@
 
     .container {
       display: flex;
+      flex-wrap: wrap;
       gap: 40px;
       justify-content: center;
     }
@@ -37,7 +38,7 @@
       padding: 20px;
       border-radius: 12px;
       border: 2px solid #ff69b4;
-      width: 300px;
+      width: 320px;
     }
 
     ul { list-style: none; padding: 0; }
@@ -49,24 +50,27 @@
       align-items: center;
     }
 
-    .calendar {
-      text-align: center;
+    .calendar { text-align: center; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ff69b4; padding: 8px; text-align: center; }
+    th { background: #ff69b4; color: white; }
+
+    td[contenteditable="true"] {
+      background: #fff0f5;
+      outline: none;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      border: 1px solid #ff69b4;
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
+    button {
       background: #ff69b4;
+      border: none;
       color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ff1493;
     }
   </style>
 </head>
@@ -79,6 +83,7 @@
     <div class="box">
       <h2>Homework Tracker</h2>
       <input type="text" id="taskInput" placeholder="Enter homework...">
+      <input type="date" id="dateInput">
       <button onclick="addTask()">Add</button>
       <ul id="taskList"></ul>
     </div>
@@ -88,21 +93,99 @@
       <h2>Calendar</h2>
       <div id="calendar"></div>
     </div>
+
+    <!-- Daily Schedule -->
+    <div class="box">
+      <h2>Daily Schedule</h2>
+      <table id="scheduleTable">
+        <tr><th>Time</th><th>Class</th><th>Action</th></tr>
+        <tr>
+          <td contenteditable="true">8:00 AM</td>
+          <td contenteditable="true">Math</td>
+          <td><button onclick="removeRow(this)">❌</button></td>
+        </tr>
+        <tr>
+          <td contenteditable="true">9:00 AM</td>
+          <td contenteditable="true">Science</td>
+          <td><button onclick="removeRow(this)">❌</button></td>
+        </tr>
+        <tr>
+          <td contenteditable="true">10:00 AM</td>
+          <td contenteditable="true">English</td>
+          <td><button onclick="removeRow(this)">❌</button></td>
+        </tr>
+      </table>
+      <button onclick="addRow()">➕ Add Row</button>
+    </div>
   </div>
 
   <script>
-    // Homework Tracker
-    function addTask() {
-      const input = document.getElementById("taskInput");
-      if (!input.value) return;
-      const li = document.createElement("li");
-      li.className = "task";
-      li.innerHTML = `${input.value} <button onclick="this.parentElement.remove()">❌</button>`;
-      document.getElementById("taskList").appendChild(li);
-      input.value = "";
+    /* ---------------- Homework Tracker with Due Dates ---------------- */
+    const taskList = document.getElementById("taskList");
+
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+      renderTasks(tasks);
     }
 
-    // Calendar Generator
+    function saveTasks(tasks) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const taskInput = document.getElementById("taskInput");
+      const dateInput = document.getElementById("dateInput");
+      if (!taskInput.value || !dateInput.value) return;
+
+      let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+      tasks.push({ text: taskInput.value, date: dateInput.value });
+      tasks = sortTasks(tasks);
+
+      saveTasks(tasks);
+      renderTasks(tasks);
+
+      taskInput.value = "";
+      dateInput.value = "";
+    }
+
+    function removeTask(index) {
+      let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+      tasks.splice(index, 1);
+      saveTasks(tasks);
+      renderTasks(tasks);
+    }
+
+    function sortTasks(tasks) {
+      return tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    function renderTasks(tasks) {
+      taskList.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+        li.className = "task";
+
+        const dueDate = new Date(task.date);
+        const today = new Date();
+        const timeLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+        let timeMsg = "";
+        if (timeLeft > 1) timeMsg = `${timeLeft} days left`;
+        else if (timeLeft === 1) timeMsg = "Due tomorrow!";
+        else if (timeLeft === 0) timeMsg = "Due today!";
+        else timeMsg = `Late by ${Math.abs(timeLeft)} days!`;
+
+        li.innerHTML = `
+          <span>${task.text} (📅 ${task.date}) — <em>${timeMsg}</em></span>
+          <button onclick="removeTask(${index})">❌</button>
+        `;
+        taskList.appendChild(li);
+      });
+    }
+
+    loadTasks();
+
+    /* ---------------- Calendar ---------------- */
     function generateCalendar() {
       const calendarDiv = document.getElementById("calendar");
       const date = new Date();
@@ -126,8 +209,59 @@
       table += "</tr></table>";
       calendarDiv.innerHTML = table;
     }
-
     generateCalendar();
+
+    /* ---------------- Editable + Customizable Schedule ---------------- */
+    const scheduleTable = document.getElementById("scheduleTable");
+
+    function saveSchedule() {
+      const rows = Array.from(scheduleTable.querySelectorAll("tr")).slice(1); // skip header
+      const data = rows.map(r => [
+        r.cells[0].textContent.trim(),
+        r.cells[1].textContent.trim()
+      ]);
+      localStorage.setItem("schedule", JSON.stringify(data));
+    }
+
+    function loadSchedule() {
+      const saved = JSON.parse(localStorage.getItem("schedule") || "[]");
+      if (saved.length === 0) return;
+
+      // Clear existing rows except header
+      scheduleTable.querySelectorAll("tr:not(:first-child)").forEach(r => r.remove());
+
+      // Add saved rows
+      saved.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td contenteditable="true">${row[0]}</td>
+          <td contenteditable="true">${row[1]}</td>
+          <td><button onclick="removeRow(this)">❌</button></td>
+        `;
+        scheduleTable.appendChild(tr);
+      });
+    }
+
+    function addRow() {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td contenteditable="true">Time</td>
+        <td contenteditable="true">Class</td>
+        <td><button onclick="removeRow(this)">❌</button></td>
+      `;
+      scheduleTable.appendChild(tr);
+      saveSchedule();
+    }
+
+    function removeRow(btn) {
+      btn.parentElement.parentElement.remove();
+      saveSchedule();
+    }
+
+    // Save whenever user types
+    scheduleTable.addEventListener("input", saveSchedule);
+
+    loadSchedule();
   </script>
 </body>
 </html>

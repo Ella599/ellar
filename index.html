@@ -2,185 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ella Fehlauer - Personal Profile</title>
+  <title>Ella Fehlauer - Profile</title>
   <style>
-    body, html {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
       font-family: Arial, sans-serif;
-      color: #ff69b4; 
-      background: #ffe4f2;
+      background: pink;
     }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      background: #ffe4f2;
-    }
-
-    .profile {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      text-align: center;
-      z-index: 1;
-    }
-
-    .profile img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 3px solid #ff1493;
-    }
-
-    .profile h1 {
-      margin-top: 10px;
-      font-size: 20px;
-      color: #ff1493;
-    }
-
-    .countdown {
-      position: absolute;
-      left: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      background: rgba(255, 240, 250, 0.8);
-      padding: 10px;
-      border-radius: 10px;
-      border: 2px solid #ff69b4;
-      z-index: 1;
-    }
-
-    #christmas { top: 200px; }
-    #summer { top: 300px; }
-
-    .toolbar {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 2;
+    header {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      padding: 10px;
     }
-
-    .toolbar button {
-      border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      color: white;
-      font-size: 14px;
+    #profilePic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+    }
+    #name {
+      margin-left: 15px;
+      font-size: 28px;
       font-weight: bold;
-      cursor: pointer;
-    }
-
-    #clearBtn { background-color: #ff69b4; }
-    .pink { background-color: #ff69b4; }
-    .purple { background-color: #a020f0; }
-    .blue { background-color: #1e90ff; }
-
-    #schoolBtn {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      background: #ff69b4;
       color: white;
-      font-size: 18px;
-      padding: 12px 24px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      z-index: 2;
     }
-
-    #schoolBtn:hover { background: #ff1493; }
+    #picUpload {
+      margin-left: 20px;
+    }
+    .countdowns {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px;
+    }
+    .countdown {
+      background: #ffb6c1;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 200px;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #ff4d94;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #e60073;
+    }
+    canvas {
+      border: 2px solid white;
+      background: #fff0f5;
+      display: block;
+      margin: 20px auto;
+    }
   </style>
 </head>
 <body>
-  <canvas id="whiteboard"></canvas>
+  <header>
+    <img id="profilePic" src="Screenshot 2025-09-25 082821.png" alt="Profile Picture">
+    <div id="name">Ella Fehlauer</div>
+    <input type="file" id="picUpload" accept="image/*">
+  </header>
 
-  <div class="profile">
-    <img src="Screenshot%202025-09-25%20082821.png" alt="Profile Picture">
-    <h1>Ella Fehlauer</h1>
+  <div class="countdowns">
+    <div class="countdown" id="christmas">
+      <h3>Christmas!</h3>
+      <p id="christmasTimer"></p>
+    </div>
+    <div class="countdown" id="summer">
+      <h3>Summer Vacation!</h3>
+      <p id="summerTimer"></p>
+    </div>
   </div>
 
-  <div class="countdown" id="christmas">
-    <p>🎄 Christmas Countdown 🎄</p>
-    <p id="timer-christmas"></p>
-  </div>
+  <button onclick="window.location.href='school.html'">Go to School Page</button>
 
-  <div class="countdown" id="summer">
-    <p>☀️ Summer Vacation! ☀️</p>
-    <p id="timer-summer"></p>
-  </div>
-
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <button id="clearBtn">Clear</button>
-    <button class="pink" data-color="#ff69b4"></button>
-    <button class="purple" data-color="#a020f0"></button>
-    <button class="blue" data-color="#1e90ff"></button>
-  </div>
-
-  <!-- School Page Button -->
-  <button id="schoolBtn" onclick="location.href='school.html'">📚 School Tools</button>
+  <canvas id="board" width="600" height="400"></canvas>
 
   <script>
-    // Whiteboard
-    const canvas = document.getElementById("whiteboard");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    let drawing = false;
-    let currentColor = "#ff69b4";
-
-    canvas.addEventListener("mousedown", () => { drawing = true; ctx.beginPath(); });
-    canvas.addEventListener("mouseup", () => drawing = false);
-    canvas.addEventListener("mousemove", e => {
-      if (!drawing) return;
-      ctx.lineWidth = 4;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = currentColor;
-      ctx.lineTo(e.clientX, e.clientY);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(e.clientX, e.clientY);
-    });
-
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
-    document.querySelectorAll("[data-color]").forEach(btn => {
-      btn.addEventListener("click", () => currentColor = btn.getAttribute("data-color"));
-    });
-
-    // Countdowns
-    function updateCountdown(targetDate, elementId, includeYears=false) {
+    /* ---------------- Countdown Timers ---------------- */
+    function updateCountdown(id, targetDate) {
       const now = new Date();
       const diff = targetDate - now;
-      if (diff <= 0) return document.getElementById(elementId).textContent = "It's here! 🎉";
 
-      let years = includeYears ? Math.floor(diff / (1000*60*60*24*365.25)) : 0;
-      const months = Math.floor((diff / (1000*60*60*24*30.44)) % 12);
-      const days = Math.floor((diff / (1000*60*60*24)) % 30.44);
-      const hours = Math.floor((diff / (1000*60*60)) % 24);
-      const minutes = Math.floor((diff / (1000*60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      let text = includeYears ? `${years} years, ` : "";
-      text += `${months} months, ${days} days, ${hours} hrs, ${minutes} min, ${seconds} sec`;
-      document.getElementById(elementId).textContent = text;
+      if (diff <= 0) {
+        document.getElementById(id).innerText = "It's here!";
+        return;
+      }
+
+      const years = Math.floor(diff / (1000*60*60*24*365));
+      const months = Math.floor((diff % (1000*60*60*24*365)) / (1000*60*60*24*30));
+      const days = Math.floor((diff % (1000*60*60*24*30)) / (1000*60*60*24));
+      const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+      const seconds = Math.floor((diff % (1000*60)) / 1000);
+
+      document.getElementById(id).innerText =
+        `${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
 
     setInterval(() => {
-      let nextChristmas = new Date(new Date().getFullYear(), 11, 25);
-      if (new Date() > nextChristmas) nextChristmas.setFullYear(nextChristmas.getFullYear() + 1);
-      updateCountdown(nextChristmas, "timer-christmas");
-      updateCountdown(new Date("May 29, 2026 00:00:00"), "timer-summer", true);
+      updateCountdown("christmasTimer", new Date("Dec 25, 2025 00:00:00"));
+      updateCountdown("summerTimer", new Date("May 29, 2026 00:00:00"));
     }, 1000);
+
+    /* ---------------- Whiteboard ---------------- */
+    const canvas = document.getElementById("board");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+
+    canvas.addEventListener("mousedown", () => drawing = true);
+    canvas.addEventListener("mouseup", () => drawing = false);
+    canvas.addEventListener("mousemove", draw);
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.fillStyle = "#ff4d94";
+      ctx.beginPath();
+      ctx.arc(e.offsetX, e.offsetY, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    /* ---------------- Profile Picture Upload ---------------- */
+    const profilePic = document.getElementById("profilePic");
+    const picUpload = document.getElementById("picUpload");
+
+    const savedPic = localStorage.getItem("profilePic");
+    if (savedPic) {
+      profilePic.src = savedPic;
+    }
+
+    picUpload.addEventListener("change", function() {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        profilePic.src = e.target.result;
+        localStorage.setItem("profilePic", e.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
   </script>
 </body>
 </html>
